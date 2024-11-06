@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as ROSLIB from 'roslib';
 
+//Contexto en React para manejar la conexión a ROS
+
 const RosContext = createContext();
 
 export const RosProvider = ({ children }) => {
