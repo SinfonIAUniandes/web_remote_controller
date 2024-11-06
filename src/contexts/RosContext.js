@@ -3,8 +3,10 @@ import * as ROSLIB from 'roslib';
 
 //Contexto en React para manejar la conexión a ROS
 
+//RosContext: Crea un contexto de React que contendrá la conexión ROS, permitiendo su acceso desde cualquier componente.
 const RosContext = createContext();
 
+// RosProvider: Componente que configura la conexión con ROS y la almacena.
 export const RosProvider = ({ children }) => {
     const [ros, setRos] = useState(null);
 
