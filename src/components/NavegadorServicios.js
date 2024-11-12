@@ -5,7 +5,7 @@ import { createService } from '../services/RosManager';
 
 const Servicio = () => {
     const { ros } = useRos(); // Obtener la instancia de ROS del contexto
-    const [url, setUrl] = useState(); // URL predeterminada para el servicio
+    const [url, setUrl] = useState(""); // URL predeterminada para el servicio
 
     // Función para manejar cambios en el campo de entrada de la URL
     const handleUrlChange = (event) => {
