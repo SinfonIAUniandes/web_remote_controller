@@ -9,6 +9,14 @@ const RosContext = createContext();
 // RosProvider: Componente que configura la conexión con ROS y la almacena.
 export const RosProvider = ({ children }) => {
     const [ros, setRos] = useState(null);
+    const [rosUrl, setRosUrl] = useState('ws://localhost:9090');  // Default to localhost
+
+    useEffect(() => {
+        const userIp = prompt("Please enter the server IP address (default is localhost):", "localhost");
+        if (userIp) {
+            setRosUrl(`ws://${userIp}:9090`);
+        }
+    }, []);    
 
     const connect = (url_param) => {
         const rosInstance = new ROSLIB.Ros({ url: url_param });
@@ -29,8 +37,8 @@ export const RosProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        connect('ws://localhost:9090'); // Replace with your WebSocket URL
-    }, []);
+        connect(rosUrl);
+    }, [rosUrl]);
 
     return (
         <RosContext.Provider value={{ ros }}>

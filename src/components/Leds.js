@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRos } from '../contexts/RosContext';
-import { createTopic } from '../services/RosManager';
-
-
+import { createTopic, createService } from '../services/RosManager';
+import * as ROSLIB from 'roslib';
 
 //Componente que permite elegir los colores de los LEDS del robot
 const LEDController = () => {
@@ -17,23 +16,30 @@ const LEDController = () => {
 
     //Color en formato hexadecimal, color: variable de estado
     const [color, setColor] = useState('#ffffff');  //Por defecto, blanco
-    
+
     //Segundos de duracion del color, time: variable de estado
     const [time, setTime] = useState(0); //0 para cambiar inmediatamente (se hace de una)
 
     //Creamr el tópico?? para publicar los colores de los LEDs
     const ledsTopic = createTopic(ros, '/leds', 'robot_toolkit_msgs/leds_parameters_msg');
 
-    //Función para convertir color hexadecimal a RGB
-    const hexToRgb = (hex) => {
-        //Convertir un valor en un número decimal
-        //parseInt(string, base actual)
-        const red = parseInt(hex.substring(1, 3), 16);
-        const green = parseInt(hex.substring(3, 5), 16);
-        const blue = parseInt(hex.substring(5, 7), 16);
-        //Objeto con los valores de los colores en RBG
-        return { red, green, blue };
-    };
+    useEffect(() => {
+        if (ros) {
+
+            const enableMiscService = createService(ros, '/robot_toolkit/misc_tools_srv', 'robot_toolkit_msgs/misc_tools_srv');
+
+            // Request for misc services
+            const miscRequest = {
+                data:{
+                    command: "enable_all"
+                } 
+            };
+
+            enableMiscService.callService(miscRequest, (result) => {
+                console.log('Misc functionalities service called:', result);
+            });
+        }
+    }, [ros]);
 
     //Función para enviar el mensaje de LEDs a ROS
     const setLEDColor = () => {
@@ -51,6 +57,17 @@ const LEDController = () => {
         // Publicar el mensaje en el tópico /leds
         ledsTopic.publish(message);
         console.log('Mensaje enviado: Nombre del led/leds - ${ledName}, Rojo - ${red}, Verde - ${green}, Azul - ${blue}, Tiempo - ${time}');
+    };
+
+    //Función para convertir color hexadecimal a RGB
+    const hexToRgb = (hex) => {
+        //Convertir un valor en un número decimal
+        //parseInt(string, base actual)
+        const red = parseInt(hex.substring(1, 3), 16);
+        const green = parseInt(hex.substring(3, 5), 16);
+        const blue = parseInt(hex.substring(5, 7), 16);
+        //Objeto con los valores de los colores en RBG
+        return { red, green, blue };
     };
 
     return (
