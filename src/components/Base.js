@@ -48,7 +48,7 @@ const Base = () => {
         var twist = new ROSLIB.Message(message);
         cmdVel.publish(twist);
 
-        console.log(event); // Aquí puedes procesar el evento según lo que necesites
+        // console.log(event);
     }
 
     const cachedHandleKeyPess = useCallback(handleKeyPress, [ros])
