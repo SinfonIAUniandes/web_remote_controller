@@ -8,15 +8,6 @@ const Base = () => {
  
     function handleKeyPress(event) {
         const bannedHTMLElements = ["input", "textarea"];
-        const keys = {
-            A: 65,
-            D: 68,
-            W: 87,
-            S: 83,
-            E: 69,
-            Q: 81
-        };
-
         if(bannedHTMLElements.includes(event.target.localName))
             return;
 
@@ -39,19 +30,29 @@ const Base = () => {
             }
         };
 
-        if(event.keyCode === keys.A) {
+        const pressedKey = event.keyCode;
+        const keys = {
+            A: 65,
+            D: 68,
+            W: 87,
+            S: 83,
+            E: 69,
+            Q: 81
+        };
+
+        if(pressedKey === keys.A) {
             message.linear.y = SPEED;
-        } else if(event.keyCode === keys.D) {
+        } else if(pressedKey === keys.D) {
             message.linear.y = -SPEED;
-        } else if(event.keyCode === keys.W) {
+        } else if(pressedKey === keys.W) {
             message.linear.x = SPEED;
-        } else if(event.keyCode === keys.S) {
+        } else if(pressedKey === keys.S) {
             message.linear.x = -SPEED;
         }
 
-        if(event.keyCode === keys.E) { // E
+        if(pressedKey === keys.E) {
             message.angular.z = -SPEED;
-        } else if (event.keyCode === keys.Q) { // Q
+        } else if (pressedKey === keys.Q) {
             message.angular.z = SPEED;
         }
 
