@@ -7,7 +7,17 @@ const Base = () => {
     const SPEED = 0.5;
  
     function handleKeyPress(event) {
-        if(["input", "textarea"].includes(event.target.localName))
+        const bannedHTMLElements = ["input", "textarea"];
+        const keys = {
+            A: 65,
+            D: 68,
+            W: 87,
+            S: 83,
+            E: 69,
+            Q: 81
+        };
+
+        if(bannedHTMLElements.includes(event.target.localName))
             return;
 
         var cmdVel = new ROSLIB.Topic({
@@ -29,19 +39,19 @@ const Base = () => {
             }
         };
 
-        if(event.keyCode === 65) { // A
+        if(event.keyCode === keys.A) {
             message.linear.y = SPEED;
-        } else if(event.keyCode === 68) { // D
+        } else if(event.keyCode === keys.D) {
             message.linear.y = -SPEED;
-        } else if(event.keyCode === 87) { // W
+        } else if(event.keyCode === keys.W) {
             message.linear.x = SPEED;
-        } else if(event.keyCode === 83) { //S
+        } else if(event.keyCode === keys.S) {
             message.linear.x = -SPEED;
         }
 
-        if(event.keyCode === 69) { // E
+        if(event.keyCode === keys.E) { // E
             message.angular.z = -SPEED;
-        } else if (event.keyCode === 81) { // Q
+        } else if (event.keyCode === keys.Q) { // Q
             message.angular.z = SPEED;
         }
 
@@ -54,14 +64,12 @@ const Base = () => {
     const cachedHandleKeyPess = useCallback(handleKeyPress, [ros])
 
     useEffect(() => {
-        // Agregar el event listener cuando el componente se monte
         window.addEventListener("keydown", cachedHandleKeyPess, false);
 
-        // Limpiar el event listener cuando el componente se desmonte
         return () => {
             window.removeEventListener("keydown", cachedHandleKeyPess, false);
         };
-    }, [cachedHandleKeyPess]); // El arreglo vacío asegura que esto se ejecute solo una vez al montar y desmontar el componente
+    }, [cachedHandleKeyPess]);
 
     return (<></>);
 }
