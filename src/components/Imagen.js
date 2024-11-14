@@ -34,7 +34,6 @@ const ServicioImagen = () => {
             return;
         }
 
-        // Cambiamos el nombre del servicio a /pytoolkit/ALTabletService/show_image
         const showImageService = createService(ros, '/pytoolkit/ALTabletService/show_image', 'robot_toolkit_msgs/tablet_service_srv');
 
         let imageData = url;
