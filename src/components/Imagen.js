@@ -19,12 +19,11 @@ const ServicioImagen = () => {
         setUrl('');
     };
 
-    // Modificada para incluir el prefijo base64 completo
     const convertFileToBase64 = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result); // Incluye el prefijo
+            reader.onload = () => resolve(reader.result);
             reader.onerror = (error) => reject(error);
         });
     };
@@ -41,7 +40,6 @@ const ServicioImagen = () => {
 
         if (file) {
             try {
-                // Convertir el archivo a base64 con el prefijo de tipo
                 imageData = await convertFileToBase64(file);
             } catch (error) {
                 console.error('Error converting file to base64:', error);
