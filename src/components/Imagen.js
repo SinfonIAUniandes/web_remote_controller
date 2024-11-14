@@ -1,3 +1,4 @@
+// src/components/ServicioImagen.js
 import React, { useState } from 'react';
 import { useRos } from '../contexts/RosContext';
 import { createService } from '../services/RosManager';
@@ -7,30 +8,27 @@ const ServicioImagen = () => {
     const [url, setUrl] = useState('');
     const [file, setFile] = useState(null);
 
-    // Maneja cambios en el campo de texto para la URL
     const handleUrlChange = (event) => {
         setUrl(event.target.value);
-        setFile(null); // Limpia el archivo si se usa URL
+        setFile(null);
     };
 
-    // Maneja la carga de un archivo
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
         setFile(selectedFile);
-        setUrl(''); // Limpia la URL si se usa archivo
+        setUrl('');
     };
 
-    // Convierte el archivo de imagen a base64 para enviar
+    // Modificada para incluir el prefijo base64 completo
     const convertFileToBase64 = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]); // Solo la base64 sin el prefijo
+            reader.onload = () => resolve(reader.result); // Incluye el prefijo
             reader.onerror = (error) => reject(error);
         });
     };
 
-    // Llama al servicio para mostrar la imagen en la tablet
     const sendImageToTablet = async () => {
         if (!ros) {
             console.error('ROS is not connected');
@@ -43,6 +41,7 @@ const ServicioImagen = () => {
 
         if (file) {
             try {
+                // Convertir el archivo a base64 con el prefijo de tipo
                 imageData = await convertFileToBase64(file);
             } catch (error) {
                 console.error('Error converting file to base64:', error);
