@@ -8,48 +8,44 @@ const ServicioImagen = () => {
     const [url, setUrl] = useState('');
     const [file, setFile] = useState(null);
 
-    // Maneja el cambio de URL en el input
     const handleUrlChange = (event) => {
         setUrl(event.target.value);
-        setFile(null); // Limpiamos el archivo si el usuario ingresa una URL
+        setFile(null);
     };
 
-    // Maneja la selección de un archivo, convierte a base64 y actualiza el campo de URL
-    const handleFileChange = async (event) => {
+    const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
         setFile(selectedFile);
-        setUrl(''); // Limpiamos la URL temporalmente
-
-        if (selectedFile) {
-            try {
-                const base64Data = await convertFileToBase64(selectedFile);
-                setUrl(base64Data); // Actualiza el campo URL con la URI base64
-            } catch (error) {
-                console.error('Error converting file to base64:', error);
-            }
-        }
+        setUrl('');
     };
 
-    // Convierte un archivo a base64 con el prefijo adecuado
     const convertFileToBase64 = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result); // Retorna la cadena completa en base64 con prefijo
+            reader.onload = () => resolve(reader.result);
             reader.onerror = (error) => reject(error);
         });
     };
 
-    // Función para enviar la imagen a la tablet
     const sendImageToTablet = async () => {
         if (!ros) {
             console.error('ROS is not connected');
             return;
         }
 
-        const showImageService = createService(ros, '/pytoolkit/ALTabletService/show_image_srv', 'robot_toolkit_msgs/tablet_service_srv');
+        const showImageService = createService(ros, '/pytoolkit/ALTabletService/show_web_view_srv', 'robot_toolkit_msgs/tablet_service_srv');
 
-        const imageData = url; // Usamos directamente el valor de URL (base64 o URL ingresada)
+        let imageData = url;
+
+        if (file) {
+            try {
+                imageData = await convertFileToBase64(file);
+            } catch (error) {
+                console.error('Error converting file to base64:', error);
+                return;
+            }
+        }
 
         const request = { url: imageData };
 
