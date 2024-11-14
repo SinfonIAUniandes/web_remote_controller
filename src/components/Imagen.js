@@ -14,17 +14,16 @@ const ServicioImagen = () => {
         setFile(null); // Limpiamos el archivo si el usuario ingresa una URL
     };
 
-    // Convierte el archivo de imagen a base64 y lo asigna a URL
+    // Maneja la selección de un archivo, convierte a base64 y actualiza el campo de URL
     const handleFileChange = async (event) => {
         const selectedFile = event.target.files[0];
         setFile(selectedFile);
-        setUrl(''); // Limpiamos la URL si el usuario carga un archivo
+        setUrl(''); // Limpiamos la URL temporalmente
 
-        // Convertir el archivo a base64 y actualizar URL
         if (selectedFile) {
             try {
                 const base64Data = await convertFileToBase64(selectedFile);
-                setUrl(base64Data); // Asignar la URI base64 al campo URL
+                setUrl(base64Data); // Actualiza el campo URL con la URI base64
             } catch (error) {
                 console.error('Error converting file to base64:', error);
             }
@@ -48,15 +47,12 @@ const ServicioImagen = () => {
             return;
         }
 
-        // Crear el servicio para mostrar la imagen
-        const showImageService = createService(ros, '/pytoolkit/ALTabletService/show_image', 'robot_toolkit_msgs/tablet_service_srv');
+        const showImageService = createService(ros, '/pytoolkit/ALTabletService/show_image_srv', 'robot_toolkit_msgs/tablet_service_srv');
 
-        const imageData = url; // Usamos directamente el valor de URL
+        const imageData = url; // Usamos directamente el valor de URL (base64 o URL ingresada)
 
-        // Configurar el request con la imagen en base64 o URL
         const request = { url: imageData };
 
-        // Llamar al servicio
         showImageService.callService(request, (result) => {
             console.log('Image sent to tablet successfully:', result);
         }, (error) => {
