@@ -57,7 +57,7 @@ const ServicioImagen = () => {
     };
 
     return (
-        <div style={{ textAlign: 'center', margin: '20px' }}>
+        <div style={{ textAlign: 'center' }}>
             <h2>Servicio para Enviar Imagen a la Tablet del Robot</h2>
             <input
                 type="text"
