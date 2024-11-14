@@ -1,7 +1,8 @@
 // src/App.js
 import React from 'react';
 import Cameras from './components/Cameras';
-import Servicio from './components/NavegadorServicios';
+import Navegador from './components/Navegador';
+import Imagen from './components/Imagen';
 
 const App = () => {
     return (
@@ -9,7 +10,9 @@ const App = () => {
             <h1>Robot camera feed</h1>
             <Cameras />
             <h1>Servicio Web</h1>
-            <Servicio />
+            <Navegador />
+            <h1>Imagen en la tablet</h1>
+            <Imagen />
         </div>
     );
 };
