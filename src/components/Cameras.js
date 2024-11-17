@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useRos } from '../contexts/RosContext'
+
+//Las funciones para crear topicos y servicios
 import { createTopic, createService } from '../services/RosManager';
 
 const Cameras = () => {
