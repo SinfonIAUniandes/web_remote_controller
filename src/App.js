@@ -1,8 +1,10 @@
 // src/App.js
 import React from 'react';
-import Cameras from './components/Cameras';
+import Cameras from './components/Cameras'
+import Base from './components/Base'
 import Navegador from './components/Navegador';
 import Imagen from './components/Imagen';
+
 
 const App = () => {
     return (
@@ -13,6 +15,8 @@ const App = () => {
             <Navegador />
             <h1>Imagen en la tablet</h1>
             <Imagen />
+            <h1>Robot base</h1>
+            <Base />
         </div>
     );
 };
