@@ -19,6 +19,10 @@ const App = () => {
             <h1>Robot base</h1>
             <Base />
             <Leds/>
+
+            
+            <h1>Control de Seguridad</h1>
+            <SecurityControl />
         </div>
     );
 };
