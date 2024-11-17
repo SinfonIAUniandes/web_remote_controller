@@ -5,6 +5,7 @@ import Leds from './components/Leds'
 import Base from './components/Base'
 import Navegador from './components/Navegador';
 import Imagen from './components/Imagen';
+import BatteryStatus from './components/BatteryStatus';
 
 
 const App = () => {
@@ -18,9 +19,10 @@ const App = () => {
             <Imagen />
             <h1>Robot base</h1>
             <Base />
-            <Leds/>
+            <Leds />
+            <h1>Estado de la Batería</h1>
+            <BatteryStatus />
         </div>
     );
 };
-
 export default App;
