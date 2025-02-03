@@ -5,6 +5,7 @@ import Leds from './components/Leds'
 import Base from './components/Base'
 import Navegador from './components/Navegador';
 import Imagen from './components/Imagen';
+import Volumen from './components/Volumen';
 
 
 const App = () => {
@@ -19,6 +20,8 @@ const App = () => {
             <h1>Robot base</h1>
             <Base />
             <Leds/>
+            <h1>Robot volumen</h1>
+            <Volumen />
         </div>
     );
 };
