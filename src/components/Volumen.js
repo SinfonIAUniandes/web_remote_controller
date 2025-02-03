@@ -11,16 +11,7 @@ const RobotAudioControl = () => {
 
     useEffect(() => {
         if (ros) {
-            // Crear servicio para controlar volumen
-            const volumeService = createService(ros, '/pytoolkit/ALAudioDevice/set_output_volume_srv', 'robot_toolkit_msgs/set_output_volume_srv');
-            
-            // Crear servicio para hacer hablar al robot
-            const speechService = createService(ros, '/robot_toolkit/audio_tools_srv', 'robot_toolkit_msgs/audio_tools_srv');
-
-            return () => {
-                volumeService.unsubscribe();
-                speechService.unsubscribe();
-            };
+            console.log("ROS conectado, servicios listos para usar");
         }
     }, [ros]);
 
@@ -28,22 +19,34 @@ const RobotAudioControl = () => {
         const newVolume = event.target.value;
         setVolume(newVolume);
         if (ros) {
-            const volumeService = createService(ros, '/pytoolkit/ALAudioDevice/set_output_volume_srv', 'robot_toolkit_msgs/set_output_volume_srv');
+            const volumeService = createService(ros, '/pytoolkit/ALAudioDevice/set_output_volume', 'robot_toolkit_msgs/SetOutputVolume');
             volumeService.callService({ volume: newVolume }, (result) => {
-                console.log('Volume updated:', result);
+                console.log('Volumen actualizado:', result);
+            }, (error) => {
+                console.error('Error al actualizar volumen:', error);
             });
         }
     };
 
     const toggleMute = () => {
         setMuted(!muted);
+        if (ros) {
+            const muteService = createService(ros, '/pytoolkit/ALAudioDevice/mute', 'robot_toolkit_msgs/MuteAudio');
+            muteService.callService({ state: !muted }, (result) => {
+                console.log('Mute cambiado:', result);
+            }, (error) => {
+                console.error('Error al cambiar mute:', error);
+            });
+        }
     };
 
     const handleSpeak = () => {
         if (ros && text.trim()) {
-            const speechService = createService(ros, '/robot_toolkit/audio_tools_srv', 'robot_toolkit_msgs/audio_tools_srv');
+            const speechService = createService(ros, '/robot_toolkit/audio_tools', 'robot_toolkit_msgs/AudioTools');
             speechService.callService({ command: 'enable_tts', language, text }, (result) => {
-                console.log('Robot spoke:', result);
+                console.log('Robot habló:', result);
+            }, (error) => {
+                console.error('Error al hablar:', error);
             });
         }
     };
