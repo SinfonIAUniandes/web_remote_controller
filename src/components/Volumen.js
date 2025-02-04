@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useRos } from '../contexts/RosContext';
-import { createService } from '../services/RosManager';
+import { createTopic, createService } from '../services/RosManager';
 import * as ROSLIB from 'roslib';
 
 const RobotAudioControl = () => {
     const { ros } = useRos();
     const [volume, setVolume] = useState(50);
     const [text, setText] = useState('');
-    const [language, setLanguage] = useState('es');
+    const [language, setLanguage] = useState('Spanish');
+    const speechTopic = createTopic(ros, '/speech', 'robot_toolkit_msgs/speech_msg');
 
     useEffect(() => {
         if (ros) {
             const enableAudioService = createService(ros, '/robot_toolkit/audio_tools_srv', 'robot_toolkit_msgs/audio_tools_srv');
             const audioRequest = {
-                command: "enable_tts"
+                data: { command: "enable_tts" }
             };
             enableAudioService.callService(audioRequest, (result) => {
                 console.log('Audio tools service initialized:', result);
@@ -56,16 +57,12 @@ const RobotAudioControl = () => {
         }
 
         if (ros) {
-            const speechService = createService(ros, '/robot_toolkit/audio_tools_srv', 'robot_toolkit_msgs/audio_tools_srv');
-            const request = {
-                command: "enable_tts",
-            };
-
-            speechService.callService(request, (result) => {
-                console.log('Se activo hablar:', result);
-            }, (error) => {
-                console.error('Error al activar:', error);
+            const message = new ROSLIB.Message({
+                language: language,
+                text: text,
+                animated: true 
             });
+            speechTopic.publish(message)
         }
     };
 
@@ -86,8 +83,8 @@ const RobotAudioControl = () => {
                     placeholder="Texto para el robot"
                 />
                 <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-                    <option value="es">Español</option>
-                    <option value="en">Inglés</option>
+                    <option value="Spanish">Español</option>
+                    <option value="English">Inglés</option>
                 </select>
                 <button onClick={handleSpeak}>Hablar</button>
             </div>
