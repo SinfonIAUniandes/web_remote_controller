@@ -22,6 +22,18 @@ const RobotAudioControl = () => {
         }
     };
 
+    const increaseVolume = () => {
+        if (volume < 100) {
+            handleVolumeChange({ target: { value: volume + 10 } });
+        }
+    };
+
+    const decreaseVolume = () => {
+        if (volume > 0) {
+            handleVolumeChange({ target: { value: volume - 10 } });
+        }
+    };
+
     const handleSpeak = () => {
         if (!text.trim()) {
             alert("Por favor, ingrese un texto para que el robot hable.");
@@ -45,6 +57,8 @@ const RobotAudioControl = () => {
             <div>
                 <label>Volumen: {volume}</label>
                 <input type="range" min="0" max="100" value={volume} onChange={handleVolumeChange} />
+                <button onClick={increaseVolume}>Subir Volumen</button>
+                <button onClick={decreaseVolume}>Bajar Volumen</button>
             </div>
             <div>
                 <input
