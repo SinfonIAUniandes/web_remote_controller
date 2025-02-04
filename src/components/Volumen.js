@@ -59,14 +59,12 @@ const RobotAudioControl = () => {
             const speechService = createService(ros, '/robot_toolkit/audio_tools_srv', 'robot_toolkit_msgs/audio_tools_srv');
             const request = {
                 command: "enable_tts",
-                language: language,
-                text: text
             };
 
             speechService.callService(request, (result) => {
-                console.log('El robot habló:', result);
+                console.log('Se activo hablar:', result);
             }, (error) => {
-                console.error('Error al hablar:', error);
+                console.error('Error al activar:', error);
             });
         }
     };
