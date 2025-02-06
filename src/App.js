@@ -5,9 +5,9 @@ import Leds from './components/Leds'
 import Base from './components/Base'
 import Navegador from './components/Navegador';
 import Imagen from './components/Imagen';
+import Battery from './components/Battery';
 import Volumen from './components/Volumen';
 import Texto from './components/Texto';
-
 
 const App = () => {
     return (
@@ -20,11 +20,12 @@ const App = () => {
             <Imagen />
             <h1>Robot base</h1>
             <Base />
-            <Leds/>
-            <h1>volumen</h1>
+            <Leds />
+            <h1>Estado de la Batería</h1>
+            <Battery />
+            <h1>Volumen</h1>
             <Volumen />
         </div>
     );
 };
-
 export default App;
