@@ -6,6 +6,7 @@ import Base from './components/Base'
 import Navegador from './components/Navegador';
 import Imagen from './components/Imagen';
 import Volumen from './components/Volumen';
+import Texto from './components/Texto';
 
 
 const App = () => {
@@ -20,8 +21,10 @@ const App = () => {
             <h1>Robot base</h1>
             <Base />
             <Leds/>
-            <h1>Robot volumen</h1>
+            <h1>volumen</h1>
             <Volumen />
+            <h1>texto</h1>
+            <Texto/>
         </div>
     );
 };
