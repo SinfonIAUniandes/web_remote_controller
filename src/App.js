@@ -6,7 +6,8 @@ import Base from './components/Base'
 import Navegador from './components/Navegador';
 import Imagen from './components/Imagen';
 import Battery from './components/Battery';
-
+import Volumen from './components/Volumen';
+import Texto from './components/Texto';
 
 const App = () => {
     return (
@@ -22,6 +23,8 @@ const App = () => {
             <Leds />
             <h1>Estado de la Batería</h1>
             <Battery />
+            <h1>Volumen</h1>
+            <Volumen />
         </div>
     );
 };
