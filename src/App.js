@@ -5,7 +5,7 @@ import Leds from './components/Leds'
 import Base from './components/Base'
 import Navegador from './components/Navegador';
 import Imagen from './components/Imagen';
-import BatteryStatus from './components/BatteryStatus';
+import Battery from './components/Battery';
 
 
 const App = () => {
@@ -21,7 +21,7 @@ const App = () => {
             <Base />
             <Leds />
             <h1>Estado de la Batería</h1>
-            <BatteryStatus />
+            <Battery />
         </div>
     );
 };

@@ -8,7 +8,7 @@ const BatteryStatus = () => {
   const { ros } = useRos(); //Acceder a la conexión ROS
 
   // Estado para almacenar el nivel de batería
-  const [batteryLevel, setBatteryLevel] = useState(null);
+  const [batteryLevel, setBatteryLevel] = useState("100");
   //setVariable: es una función que se usa para cambiar el valor de variable
   //batteryLevel: valor actual que quiero recordar
   //useState(valorInicial): dar un valor inicial a la variable de estado batteryLevel (en este caso null)
@@ -28,27 +28,22 @@ const BatteryStatus = () => {
         // Llamar al servicio y tener la rta
         batteryService.callService(request, (result) => {
             console.log('Respuesta del servicio de bateria:', result);
-            setBatteryLevel(result.percentage); // Actualizar el nivel de batería, con la "llave" percentaje
+            setBatteryLevel(result.porcentage); // Actualizar el nivel de batería, con la "llave" percentaje
         });
     }
     }, [ros]);
 
     return (
         <div>
-            <h2>Estado de la Batería</h2>
 
             {/* Mostrar el nivel de batería si ya se tiene */}
-            {batteryLevel !== null ? (
-                <div>
-                    {/*Mostrar el porcentaje de batería*/}
-                    <p>Nivel de batería: {batteryLevel}%</p>
+            <div>
+                {/*Mostrar el porcentaje de batería*/}
+                <p>Nivel de batería: {batteryLevel}%</p>
 
-                    {/*Barra de progreso visual para el nivel de batería*/}
-                    <progress value={batteryLevel} max="100"></progress>
-                </div>
-            ) : (
-                <p>Obteniendo nivel de batería...</p>
-            )}
+                {/*Barra de progreso visual para el nivel de batería*/}
+                <progress value={batteryLevel} max="100"></progress>
+            </div>
         </div>
     );
     };
