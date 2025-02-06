@@ -23,8 +23,6 @@ const App = () => {
             <Leds/>
             <h1>volumen</h1>
             <Volumen />
-            <h1>texto</h1>
-            <Texto/>
         </div>
     );
 };
