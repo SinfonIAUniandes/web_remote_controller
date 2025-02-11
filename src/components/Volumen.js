@@ -5,8 +5,19 @@ import * as ROSLIB from 'roslib';
 
 const RobotAudioControl = () => {
     const { ros } = useRos();
-    const [volume, setVolume] = useState(50);
+    const [volume, setVolume] = useState(null);
 
+    useEffect(() => {
+        if (ros) {
+            const getVolumeService = createService(ros, '/pytoolkit/ALAudioDevice/get_output_volume_srv', 'robot_toolkit_msgs/get_output_volume_srv');
+            getVolumeService.callService({}, (result) => {
+                setVolume(result.volume);
+                console.log('Volumen inicial obtenido:', result.volume);
+            }, (error) => {
+                console.error('Error al obtener el volumen inicial:', error);
+            });
+        }
+    }, [ros]);
 
     const handleVolumeChange = (event) => {
         const newVolume = parseInt(event.target.value, 10);
@@ -38,10 +49,10 @@ const RobotAudioControl = () => {
         <div style={{ textAlign: 'center' }}>
             <h2>Control de Audio del Robot</h2>
             <div>
-                <label>Volumen: {volume}</label>
-                <input type="range" min="0" max="100" value={volume} onChange={handleVolumeChange} />
-                <button onClick={increaseVolume}>Subir Volumen</button>
-                <button onClick={decreaseVolume}>Bajar Volumen</button>
+                <label>Volumen: {volume !== null ? volume : 'Cargando...'}</label>
+                <input type="range" min="0" max="100" value={volume || 0} onChange={handleVolumeChange} disabled={volume === null} />
+                <button onClick={increaseVolume} disabled={volume === null}>Subir Volumen</button>
+                <button onClick={decreaseVolume} disabled={volume === null}>Bajar Volumen</button>
             </div>
         </div>
     );
