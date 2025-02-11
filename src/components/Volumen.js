@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useRos } from '../contexts/RosContext';
-import { createTopic, createService } from '../services/RosManager';
-import * as ROSLIB from 'roslib';
+import { createService } from '../services/RosManager';
 
 const RobotAudioControl = () => {
     const { ros } = useRos();
-    const [volume, setVolume] = useState(50);
+    const [volume, setVolume] = useState(null);  // Estado inicial nulo para saber si ya se ha cargado
 
+    // Obtener el volumen actual al cargar el componente
     useEffect(() => {
         if (ros) {
             const getVolumeService = createService(ros, '/pytoolkit/ALAudioDevice/get_output_volume_srv', 'robot_toolkit_msgs/get_output_volume_srv');
+
             getVolumeService.callService({}, (result) => {
-                setVolume(result.volume);
-                console.log('Volumen inicial obtenido:', result.volume);
+                if (result && typeof result.volume === 'number') {
+                    setVolume(result.volume);  // Establecer el volumen recibido
+                    console.log('Volumen inicial obtenido:', result.volume);
+                } else {
+                    console.error('Respuesta del servicio inválida:', result);
+                    setVolume(50);  // Valor por defecto si falla
+                }
             }, (error) => {
                 console.error('Error al obtener el volumen inicial:', error);
+                setVolume(50);  // Valor por defecto en caso de error
             });
         }
     }, [ros]);
@@ -22,9 +29,11 @@ const RobotAudioControl = () => {
     const handleVolumeChange = (event) => {
         const newVolume = parseInt(event.target.value, 10);
         setVolume(newVolume);
+
         if (ros) {
             const volumeService = createService(ros, '/pytoolkit/ALAudioDevice/set_output_volume_srv', 'robot_toolkit_msgs/set_output_volume_srv');
             const request = { volume: newVolume };
+
             volumeService.callService(request, (result) => {
                 console.log('Volumen actualizado:', result);
             }, (error) => {
@@ -50,7 +59,14 @@ const RobotAudioControl = () => {
             <h2>Control de Audio del Robot</h2>
             <div>
                 <label>Volumen: {volume !== null ? volume : 'Cargando...'}</label>
-                <input type="range" min="0" max="100" value={volume || 0} onChange={handleVolumeChange} disabled={volume === null} />
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={volume !== null ? volume : 50}
+                    onChange={handleVolumeChange}
+                    disabled={volume === null}
+                />
                 <button onClick={increaseVolume} disabled={volume === null}>Subir Volumen</button>
                 <button onClick={decreaseVolume} disabled={volume === null}>Bajar Volumen</button>
             </div>
