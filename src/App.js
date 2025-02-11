@@ -23,6 +23,8 @@ const App = () => {
             <Leds />
             <h1>Estado de la Batería</h1>
             <Battery />
+            <h1>Texto</h1>
+            <Texto/>
             <h1>Volumen</h1>
             <Volumen />
         </div>
