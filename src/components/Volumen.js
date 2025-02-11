@@ -5,7 +5,7 @@ import * as ROSLIB from 'roslib';
 
 const RobotAudioControl = () => {
     const { ros } = useRos();
-    const [volume, setVolume] = useState(null);
+    const [volume, setVolume] = useState(50);
 
     useEffect(() => {
         if (ros) {
