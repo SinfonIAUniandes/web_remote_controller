@@ -8,6 +8,7 @@ import Imagen from './components/Imagen';
 import Battery from './components/Battery';
 import Volumen from './components/Volumen';
 import Texto from './components/Texto';
+import Animaciones from './components/Animaciones';
 
 const App = () => {
     return (
@@ -27,6 +28,8 @@ const App = () => {
             <Texto/>
             <h1>Volumen</h1>
             <Volumen />
+            <h1>Animaciones</h1>
+            <Animaciones />
         </div>
     );
 };
