@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRos } from '../contexts/RosContext';
-import { createTopic, createService } from '../services/RosManager';
-import * as ROSLIB from 'roslib';
+import { createService } from '../services/RosManager';
 
 const RobotAudioControl = () => {
     const { ros } = useRos();
@@ -9,12 +8,12 @@ const RobotAudioControl = () => {
 
     useEffect(() => {
         if (ros) {
-            const getVolumeService = createService(ros, '/pytoolkit/ALAudioDevice/get_output_volume_srv', 'robot_toolkit_msgs/get_output_volume_srv');
-            getVolumeService.callService({}, (result) => {
-                setVolume(result.volume);
-                console.log('Volumen inicial obtenido:', result.volume);
+            const volumeService = createService(ros, '/pytoolkit/ALAudioDevice/set_output_volume_srv', 'robot_toolkit_msgs/set_output_volume_srv');
+            const request = { volume: 50 };
+            volumeService.callService(request, (result) => {
+                console.log('Volumen inicial establecido en 50:', result);
             }, (error) => {
-                console.error('Error al obtener el volumen inicial:', error);
+                console.error('Error al establecer el volumen inicial:', error);
             });
         }
     }, [ros]);
@@ -22,9 +21,11 @@ const RobotAudioControl = () => {
     const handleVolumeChange = (event) => {
         const newVolume = parseInt(event.target.value, 10);
         setVolume(newVolume);
+
         if (ros) {
             const volumeService = createService(ros, '/pytoolkit/ALAudioDevice/set_output_volume_srv', 'robot_toolkit_msgs/set_output_volume_srv');
             const request = { volume: newVolume };
+
             volumeService.callService(request, (result) => {
                 console.log('Volumen actualizado:', result);
             }, (error) => {
@@ -49,10 +50,16 @@ const RobotAudioControl = () => {
         <div style={{ textAlign: 'center' }}>
             <h2>Control de Audio del Robot</h2>
             <div>
-                <label>Volumen: {volume !== null ? volume : 'Cargando...'}</label>
-                <input type="range" min="0" max="100" value={volume || 0} onChange={handleVolumeChange} disabled={volume === null} />
-                <button onClick={increaseVolume} disabled={volume === null}>Subir Volumen</button>
-                <button onClick={decreaseVolume} disabled={volume === null}>Bajar Volumen</button>
+                <label>Volumen: {volume}</label>
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={volume}
+                    onChange={handleVolumeChange}
+                />
+                <button onClick={increaseVolume}>Subir Volumen</button>
+                <button onClick={decreaseVolume}>Bajar Volumen</button>
             </div>
         </div>
     );
