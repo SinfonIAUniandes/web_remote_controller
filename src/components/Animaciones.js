@@ -8,20 +8,29 @@ const AnimationControl = () => {
     const { ros } = useRos();
     const [selectedCategory, setSelectedCategory] = useState('BodyTalk');
     const [selectedAnimation, setSelectedAnimation] = useState('');
+    const [isConnected, setIsConnected] = useState(false);
 
-    const animationTopic = createTopic(ros, '/animations', 'robot_toolkit_msgs/animation_msg');
+    let animationTopic = null;
 
     useEffect(() => {
         if (ros) {
+            console.log('Conectado a ROS:', ros);
+            setIsConnected(true);
+
+            animationTopic = createTopic(ros, '/animations', 'robot_toolkit_msgs/animation_msg');
+
             const enableAnimationService = createService(ros, '/robot_toolkit/manipulation_service', 'robot_toolkit_msgs/manipulation_service');
             const animationRequest = {
                 data: { command: "enable_animation" }
             };
+
             enableAnimationService.callService(animationRequest, (result) => {
-                console.log('Animation service initialized:', result);
+                console.log('Servicio de animación inicializado:', result);
             }, (error) => {
-                console.error('Error initializing animation service:', error);
+                console.error('Error al inicializar el servicio de animación:', error);
             });
+        } else {
+            console.warn('No se pudo conectar a ROS');
         }
     }, [ros]);
 
@@ -31,13 +40,18 @@ const AnimationControl = () => {
             return;
         }
 
-        if (ros) {
+        if (ros && animationTopic) {
+            console.log(`Enviando animación: ${selectedAnimation} en la categoría: ${selectedCategory}`);
+
             const message = new ROSLIB.Message({
                 name: selectedAnimation,
                 category: selectedCategory
             });
+
             animationTopic.publish(message);
-            console.log('Animación enviada:', selectedAnimation);
+            console.log('Animación publicada exitosamente:', message);
+        } else {
+            console.error('Error: No conectado a ROS o el tópico de animación no está disponible.');
         }
     };
 
@@ -70,7 +84,7 @@ const AnimationControl = () => {
                         )}
                 </select>
             </div>
-            <button onClick={handleAnimation}>Ejecutar Animación</button>
+            <button onClick={handleAnimation} disabled={!isConnected}>Ejecutar Animación</button>
         </div>
     );
 };
