@@ -4,24 +4,16 @@ import { createService } from '../services/RosManager';
 
 const RobotAudioControl = () => {
     const { ros } = useRos();
-    const [volume, setVolume] = useState(null);  // Estado inicial nulo para saber si ya se ha cargado
+    const [volume, setVolume] = useState(50);
 
-    // Obtener el volumen actual al cargar el componente
     useEffect(() => {
         if (ros) {
-            const getVolumeService = createService(ros, '/pytoolkit/ALAudioDevice/get_output_volume_srv', 'robot_toolkit_msgs/get_output_volume_srv');
-
-            getVolumeService.callService({}, (result) => {
-                if (result && typeof result.volume === 'number') {
-                    setVolume(result.volume);  // Establecer el volumen recibido
-                    console.log('Volumen inicial obtenido:', result.volume);
-                } else {
-                    console.error('Respuesta del servicio inválida:', result);
-                    setVolume(50);  // Valor por defecto si falla
-                }
+            const volumeService = createService(ros, '/pytoolkit/ALAudioDevice/set_output_volume_srv', 'robot_toolkit_msgs/set_output_volume_srv');
+            const request = { volume: 50 };
+            volumeService.callService(request, (result) => {
+                console.log('Volumen inicial establecido en 50:', result);
             }, (error) => {
-                console.error('Error al obtener el volumen inicial:', error);
-                setVolume(50);  // Valor por defecto en caso de error
+                console.error('Error al establecer el volumen inicial:', error);
             });
         }
     }, [ros]);
@@ -58,17 +50,16 @@ const RobotAudioControl = () => {
         <div style={{ textAlign: 'center' }}>
             <h2>Control de Audio del Robot</h2>
             <div>
-                <label>Volumen: {volume !== null ? volume : 'Cargando...'}</label>
+                <label>Volumen: {volume}</label>
                 <input
                     type="range"
                     min="0"
                     max="100"
-                    value={volume !== null ? volume : 50}
+                    value={volume}
                     onChange={handleVolumeChange}
-                    disabled={volume === null}
                 />
-                <button onClick={increaseVolume} disabled={volume === null}>Subir Volumen</button>
-                <button onClick={decreaseVolume} disabled={volume === null}>Bajar Volumen</button>
+                <button onClick={increaseVolume}>Subir Volumen</button>
+                <button onClick={decreaseVolume}>Bajar Volumen</button>
             </div>
         </div>
     );
