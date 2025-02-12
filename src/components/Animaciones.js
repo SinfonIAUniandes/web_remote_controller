@@ -9,45 +9,25 @@ const animations = [
     "BodyTalk/Listening/Listening_3",
     "BodyTalk/Listening/Listening_4",
     "BodyTalk/Listening/Listening_5",
-    "BodyTalk/Listening/Listening_6",
-    "BodyTalk/Listening/Listening_7",
-    "BodyTalk/Speaking/BodyTalk_1",
-    "BodyTalk/Speaking/BodyTalk_10",
-    "BodyTalk/Speaking/BodyTalk_11",
-    "BodyTalk/Speaking/BodyTalk_12",
-    "BodyTalk/Speaking/BodyTalk_13",
-    "BodyTalk/Speaking/BodyTalk_14",
-    "BodyTalk/Speaking/BodyTalk_15",
-    "BodyTalk/Speaking/BodyTalk_16",
-    "BodyTalk/Speaking/BodyTalk_2",
-    "BodyTalk/Speaking/BodyTalk_3",
-    "BodyTalk/Speaking/BodyTalk_4",
-    "BodyTalk/Speaking/BodyTalk_5",
-    "BodyTalk/Speaking/BodyTalk_6",
-    "BodyTalk/Speaking/BodyTalk_7",
-    "BodyTalk/Speaking/BodyTalk_8",
-    "BodyTalk/Speaking/BodyTalk_9",
-    "Emotions/Positive/Happy_1",
-    "Gestures/Excited_1",
-    "Waiting/Stretch_1",
-    "arcadia/full_launcher",
-    "asereje/full_launcher",
-    "jgangnamstyle/full_launcher",
-    "la_bamba/full_launcher",
-    "Freezer",
-    "Freezer_Pose"
+    "BodyTalk/Listening/Listening_6"
 ];
 
 const RobotAnimationControl = () => {
     const { ros } = useRos();
     const [selectedAnimation, setSelectedAnimation] = useState('');
-    const [animationPublisher, setAnimationPublisher] = useState(null);
+    const animationTopic = createTopic(ros, '/animations', 'robot_toolkit_msgs/animation_msg');
 
     useEffect(() => {
         if (ros) {
-            // Initialize ROS publishers
-            const animationPub = createTopic(ros, '/animations', 'robot_toolkit_msgs/animation_msg');
-            setAnimationPublisher(animationPub);
+            const enableMotionService = createService(ros, '/robot_toolkit/motion_tools_srv', 'robot_toolkit_msgs/motion_tools_srv');
+            const motionRequest = {
+                command: "enable_all"
+            };
+            enableMotionService.callService(motionRequest, (result) => {
+                console.log('Motion tools service initialized:', result);
+            }, (error) => {
+                console.error('Error initializing motion service:', error);
+            });
         }
     }, [ros]);
 
@@ -57,17 +37,13 @@ const RobotAnimationControl = () => {
             return;
         }
 
-        const animMsg = new ROSLIB.Message({
+        const message = new ROSLIB.Message({
             family: "animations",
             animation_name: selectedAnimation
         });
 
-        if (animationPublisher) {
-            animationPublisher.publish(animMsg);
-            console.log(`Animación enviada: ${selectedAnimation}`);
-        } else {
-            console.error("El publicador de animaciones no está disponible.");
-        }
+        animationTopic.publish(message);
+        console.log(`Animación enviada: ${selectedAnimation}`);
     };
 
     return (
