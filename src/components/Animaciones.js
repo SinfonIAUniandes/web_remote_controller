@@ -57,12 +57,14 @@ const RobotAnimationControl = () => {
         }
 
         const message = new ROSLIB.Message({
-            animation: selectedAnimation
+            name: selectedAnimation // Corrected field based on ROS message structure
         });
 
         if (animationPublisher) {
             animationPublisher.publish(message);
             console.log(`Animación enviada: ${selectedAnimation}`);
+        } else {
+            console.error("El publicador de animaciones no está disponible.");
         }
     };
 
