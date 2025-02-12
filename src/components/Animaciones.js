@@ -45,8 +45,9 @@ const RobotAnimationControl = () => {
 
     useEffect(() => {
         if (ros) {
-            const topic = createTopic(ros, '/animations', 'robot_toolkit_msgs/animation_msg');
-            setAnimationPublisher(topic);
+            // Initialize ROS publishers
+            const animationPub = createTopic(ros, '/animations', 'robot_toolkit_msgs/animation_msg');
+            setAnimationPublisher(animationPub);
         }
     }, [ros]);
 
@@ -56,13 +57,13 @@ const RobotAnimationControl = () => {
             return;
         }
 
-        const message = new ROSLIB.Message({
+        const animMsg = new ROSLIB.Message({
             family: "animations",
             animation_name: selectedAnimation
         });
 
         if (animationPublisher) {
-            animationPublisher.publish(message);
+            animationPublisher.publish(animMsg);
             console.log(`Animación enviada: ${selectedAnimation}`);
         } else {
             console.error("El publicador de animaciones no está disponible.");
