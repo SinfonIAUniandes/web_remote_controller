@@ -3,84 +3,60 @@ import { useRos } from '../contexts/RosContext';
 import { createTopic, createService } from '../services/RosManager';
 import * as ROSLIB from 'roslib';
 
-const animations = [
-    "BodyTalk/Listening/Listening_1",
-    "BodyTalk/Listening/Listening_2",
-    "BodyTalk/Listening/Listening_3",
-    "BodyTalk/Listening/Listening_4",
-    "BodyTalk/Listening/Listening_5",
-    "BodyTalk/Listening/Listening_6",
-    "BodyTalk/Listening/Listening_7",
-    "BodyTalk/Speaking/BodyTalk_1",
-    "BodyTalk/Speaking/BodyTalk_10",
-    "BodyTalk/Speaking/BodyTalk_11",
-    "BodyTalk/Speaking/BodyTalk_12",
-    "BodyTalk/Speaking/BodyTalk_13",
-    "BodyTalk/Speaking/BodyTalk_14",
-    "BodyTalk/Speaking/BodyTalk_15",
-    "BodyTalk/Speaking/BodyTalk_16",
-    "BodyTalk/Speaking/BodyTalk_2",
-    "BodyTalk/Speaking/BodyTalk_3",
-    "BodyTalk/Speaking/BodyTalk_4",
-    "BodyTalk/Speaking/BodyTalk_5",
-    "BodyTalk/Speaking/BodyTalk_6",
-    "BodyTalk/Speaking/BodyTalk_7",
-    "BodyTalk/Speaking/BodyTalk_8",
-    "BodyTalk/Speaking/BodyTalk_9",
-    "Emotions/Positive/Happy_1",
-    "Gestures/Excited_1",
-    "Waiting/Stretch_1",
-    "arcadia/full_launcher",
-    "asereje/full_launcher",
-    "jgangnamstyle/full_launcher",
-    "la_bamba/full_launcher",
-    "Freezer",
-    "Freezer_Pose"
-];
-
-const RobotAnimationControl = () => {
+const RobotAudioControl = () => {
     const { ros } = useRos();
-    const [selectedAnimation, setSelectedAnimation] = useState('');
-    const [animationPublisher, setAnimationPublisher] = useState(null);
+    const [text, setText] = useState('');
+    const [language, setLanguage] = useState('Spanish');
+    const speechTopic = createTopic(ros, '/speech', 'robot_toolkit_msgs/speech_msg');
 
     useEffect(() => {
         if (ros) {
-            const topic = createTopic(ros, '/animations', 'robot_toolkit_msgs/animation_msg');
-            setAnimationPublisher(topic);
+            const enableAudioService = createService(ros, '/robot_toolkit/audio_tools_srv', 'robot_toolkit_msgs/audio_tools_srv');
+            const audioRequest = {
+                data: { command: "enable_tts" }
+            };
+            enableAudioService.callService(audioRequest, (result) => {
+                console.log('Audio tools service initialized:', result);
+            }, (error) => {
+                console.error('Error initializing audio service:', error);
+            });
         }
     }, [ros]);
 
-    const handleAnimation = () => {
-        if (!selectedAnimation) {
-            alert("Seleccione una animación para ejecutar.");
+
+    const handleSpeak = () => {
+        if (!text.trim()) {
+            alert("Por favor, ingrese un texto para que el robot hable.");
             return;
         }
 
-        const message = new ROSLIB.Message({
-            family: "animations",
-            animation_name: selectedAnimation
-        });
-
-        if (animationPublisher) {
-            animationPublisher.publish(message);
-            console.log(`Animación enviada: ${selectedAnimation}`);
-        } else {
-            console.error("El publicador de animaciones no está disponible.");
+        if (ros) {
+            const message = new ROSLIB.Message({
+                language: language,
+                text: text,
+                animated: true 
+            });
+            speechTopic.publish(message)
         }
     };
 
     return (
         <div style={{ textAlign: 'center' }}>
-            <h2>Control de Animaciones del Robot</h2>
-            <select value={selectedAnimation} onChange={(e) => setSelectedAnimation(e.target.value)}>
-                <option value="">Seleccione una animación</option>
-                {animations.map((animation, index) => (
-                    <option key={index} value={animation}>{animation}</option>
-                ))}
-            </select>
-            <button onClick={handleAnimation}>Ejecutar Animación</button>
+            <div>
+                <input
+                    type="text"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Texto para el robot"
+                />
+                <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+                    <option value="Spanish">Español</option>
+                    <option value="English">Inglés</option>
+                </select>
+                <button onClick={handleSpeak}>Hablar</button>
+            </div>
         </div>
     );
 };
 
-export default RobotAnimationControl;
+export default RobotAudioControl;
