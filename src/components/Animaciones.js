@@ -1,17 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import { useRos } from '../contexts/RosContext';
-import { startManipulationMessage, sendAnimation } from './manipulationService';
-import animations from './animations.json'; // Assuming animations are stored as JSON
+import { createTopic } from '../services/RosManager';
+import * as ROSLIB from 'roslib';
 
-const AnimationView = () => {
+const animations = [
+    "BodyTalk/Listening/Listening_1",
+    "BodyTalk/Listening/Listening_2",
+    "BodyTalk/Listening/Listening_3",
+    "BodyTalk/Listening/Listening_4",
+    "BodyTalk/Listening/Listening_5",
+    "BodyTalk/Listening/Listening_6",
+    "BodyTalk/Listening/Listening_7",
+    "BodyTalk/Speaking/BodyTalk_1",
+    "BodyTalk/Speaking/BodyTalk_10",
+    "BodyTalk/Speaking/BodyTalk_11",
+    "BodyTalk/Speaking/BodyTalk_12",
+    "BodyTalk/Speaking/BodyTalk_13",
+    "BodyTalk/Speaking/BodyTalk_14",
+    "BodyTalk/Speaking/BodyTalk_15",
+    "BodyTalk/Speaking/BodyTalk_16",
+    "BodyTalk/Speaking/BodyTalk_2",
+    "BodyTalk/Speaking/BodyTalk_3",
+    "BodyTalk/Speaking/BodyTalk_4",
+    "BodyTalk/Speaking/BodyTalk_5",
+    "BodyTalk/Speaking/BodyTalk_6",
+    "BodyTalk/Speaking/BodyTalk_7",
+    "BodyTalk/Speaking/BodyTalk_8",
+    "BodyTalk/Speaking/BodyTalk_9",
+    "Emotions/Positive/Happy_1",
+    "Gestures/Excited_1",
+    "Waiting/Stretch_1",
+    "arcadia/full_launcher",
+    "asereje/full_launcher",
+    "jgangnamstyle/full_launcher",
+    "la_bamba/full_launcher",
+    "Freezer",
+    "Freezer_Pose"
+];
+
+const RobotAnimationControl = () => {
     const { ros } = useRos();
-    const [animationPublisher, setAnimationPublisher] = useState(null);
     const [selectedAnimation, setSelectedAnimation] = useState('');
+    const [animationPublisher, setAnimationPublisher] = useState(null);
 
     useEffect(() => {
         if (ros) {
-            const publisher = startManipulationMessage(ros);
-            setAnimationPublisher(publisher);
+            const topic = createTopic(ros, '/animations', 'robot_toolkit_msgs/animation_msg');
+            setAnimationPublisher(topic);
         }
     }, [ros]);
 
@@ -20,12 +55,20 @@ const AnimationView = () => {
             alert("Seleccione una animación para ejecutar.");
             return;
         }
-        sendAnimation(animationPublisher, selectedAnimation);
+
+        const message = new ROSLIB.Message({
+            animation: selectedAnimation
+        });
+
+        if (animationPublisher) {
+            animationPublisher.publish(message);
+            console.log(`Animación enviada: ${selectedAnimation}`);
+        }
     };
 
     return (
         <div style={{ textAlign: 'center' }}>
-            <h2>Control de Animaciones</h2>
+            <h2>Control de Animaciones del Robot</h2>
             <select value={selectedAnimation} onChange={(e) => setSelectedAnimation(e.target.value)}>
                 <option value="">Seleccione una animación</option>
                 {animations.map((animation, index) => (
@@ -37,4 +80,4 @@ const AnimationView = () => {
     );
 };
 
-export default AnimationView;
+export default RobotAnimationControl;
