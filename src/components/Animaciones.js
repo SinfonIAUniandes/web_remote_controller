@@ -47,7 +47,7 @@ const RobotAnimationControl = () => {
         if (ros) {
             const enableMotionService = createService(ros, '/robot_toolkit/motion_tools_srv', 'robot_toolkit_msgs/motion_tools_srv');
             const motionRequest = {
-                command: "enable_all"
+                data: { command: "enable_all" }
             };
 
             enableMotionService.callService(motionRequest, (result) => {
@@ -65,8 +65,23 @@ const RobotAnimationControl = () => {
         }
 
         const message = new ROSLIB.Message({
-            command: "play_animation",
-            animation: selectedAnimation
+            family: "animations",
+            animation_name: selectedAnimation
+        });
+
+        if (animationTopic) {
+            animationTopic.publish(message);
+            console.log(`Animación enviada: ${selectedAnimation}`);
+        } else {
+            console.error("El publicador de animaciones no está disponible.");
+        }
+    };
+
+    const standardAnimation = () => {
+        
+        const message = new ROSLIB.Message({
+            family: "animations",
+            animation_name: "Gestures/Maybe_1"
         });
 
         if (animationTopic) {
@@ -87,6 +102,7 @@ const RobotAnimationControl = () => {
                 ))}
             </select>
             <button onClick={handleAnimation}>Ejecutar Animación</button>
+            <button onClick={standardAnimation}>Posicion estandar</button>
         </div>
     );
 };
