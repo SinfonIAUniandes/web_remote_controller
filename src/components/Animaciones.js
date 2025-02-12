@@ -57,7 +57,8 @@ const RobotAnimationControl = () => {
         }
 
         const message = new ROSLIB.Message({
-            name: selectedAnimation // Corrected field based on ROS message structure
+            family: "animations",          // Required by the message definition
+            animation_name: selectedAnimation // Correct field from the Python code
         });
 
         if (animationPublisher) {
