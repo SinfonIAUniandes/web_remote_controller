@@ -10,17 +10,17 @@ const RobotAudioPlayer = () => {
     // Maneja la carga del archivo desde el PC
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        if (file && file.type === "audio/mp3") {
+        if (file) {
             setSelectedFile(file);
         } else {
-            alert("Por favor, selecciona un archivo MP3 válido.");
+            alert("Por favor, selecciona un archivo de audio.");
         }
     };
 
     // Envía el archivo al robot para que lo reproduzca
     const handlePlay = async () => {
         if (!selectedFile) {
-            alert("Por favor, selecciona un archivo MP3 para reproducir.");
+            alert("Por favor, selecciona un archivo de audio para reproducir.");
             return;
         }
 
@@ -49,7 +49,7 @@ const RobotAudioPlayer = () => {
     return (
         <div style={{ textAlign: "center" }}>
             <h2>Reproducir Audio en el Robot</h2>
-            <input type="file" accept="audio/mp3" onChange={handleFileChange} />
+            <input type="file" accept="audio/*" onChange={handleFileChange} />
             <button onClick={handlePlay} disabled={!selectedFile}>Reproducir</button>
         </div>
     );
