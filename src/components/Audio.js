@@ -10,48 +10,41 @@ const RobotAudioControl = () => {
 
     // Función para manejar la selección del archivo
     const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
+        const file = event.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+        }
     };
 
-    // Función para enviar el archivo al robot
-    const handlePlayAudio = async () => {
+    // Función para enviar el audio al robot y reproducirlo
+    const handlePlayAudio = () => {
         if (!selectedFile) {
             alert("Seleccione un archivo de audio.");
             return;
         }
 
-        // Crear objeto FormData para subir el archivo
-        const formData = new FormData();
-        formData.append("audio_file", selectedFile, "audio_temp.wav");
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(selectedFile);
+        reader.onload = () => {
+            const audioData = Array.from(new Uint8Array(reader.result));
 
-        try {
-            const uploadResponse = await fetch("http://ROBOT_IP:5000/upload_audio", {
-                method: "POST",
-                body: formData
-            });
-
-            if (!uploadResponse.ok) {
-                throw new Error("Error al subir el archivo al robot.");
-            }
-
-            const uploadData = await uploadResponse.json();
-            console.log("Archivo subido:", uploadData);
-
-            // Enviar mensaje ROS para reproducir el archivo
+            // Crear mensaje ROS
             const message = new ROSLIB.Message({
                 command: "play_audio",
-                file_path: uploadData.file_path // Ruta del archivo en el robot
+                data: audioData
             });
 
+            // Enviar mensaje ROS
             audioService.callService(message, (result) => {
                 console.log('Reproduciendo audio en el robot:', result);
             }, (error) => {
                 console.error('Error al reproducir el audio:', error);
             });
+        };
 
-        } catch (error) {
-            console.error("Error:", error);
-        }
+        reader.onerror = () => {
+            console.error("Error al leer el archivo de audio.");
+        };
     };
 
     return (
