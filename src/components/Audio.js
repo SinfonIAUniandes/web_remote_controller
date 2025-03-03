@@ -32,8 +32,8 @@ const RobotAudioControl = () => {
 
         // Crear mensaje ROS con la URL del audio
         const request = new ROSLIB.ServiceRequest({
-            names: audioUrl,  // El servicio espera 'names' como parámetro
-            stiffnesses: 1.0  // Configuración para reproducción
+            names: audioUrl,  
+            stiffnesses: 1.0 
         });
 
         // Enviar mensaje ROS al servicio
@@ -51,10 +51,7 @@ const RobotAudioControl = () => {
             return;
         }
 
-        // Crear mensaje vacío para el servicio stop
         const stopRequest = new ROSLIB.ServiceRequest({});
-
-        // Enviar solicitud de detener audio
         stopAudioService.callService(stopRequest, (result) => {
             console.log('Deteniendo audio en el robot:', result);
         }, (error) => {
