@@ -8,12 +8,14 @@ const RobotAudioControl = () => {
     const [audioUrl, setAudioUrl] = useState("");
 
     // Verificamos que ROS esté disponible antes de crear el servicio
-    const audioService = ros ? createService(ros, '/pytoolkit/ALAudio', 'robot_toolkit_msgs/audio_tools_srv') : null;
+    const audioService = ros 
+        ? createService(ros, '/pytoolkit/ALAudio/play_audio_stream_srv', 'robot_toolkit_msgs/audio_tools_srv') 
+        : null;
 
     // Enviar URL de audio al robot
     const handlePlayUrl = () => {
         if (!audioUrl.trim()) {
-            alert("Ingrese una URL de audio.");
+            alert("Ingrese una URL de audio válida.");
             return;
         }
 
@@ -22,14 +24,14 @@ const RobotAudioControl = () => {
             return;
         }
 
-        // Crear mensaje ROS con la URL
-        const message = new ROSLIB.Message({
-            command: "player/play_audio",
-            url: audioUrl
+        // Crear mensaje ROS con la URL del audio
+        const request = new ROSLIB.ServiceRequest({
+            filename: audioUrl,  // El servicio espera 'filename' como parámetro
+            loop: false          // Configuración para reproducción en bucle (ajústalo si es necesario)
         });
 
         // Enviar mensaje ROS al servicio
-        audioService.callService(message, (result) => {
+        audioService.callService(request, (result) => {
             console.log('Reproduciendo audio en el robot desde URL:', result);
         }, (error) => {
             console.error('Error al reproducir el audio desde URL:', error);
@@ -42,7 +44,7 @@ const RobotAudioControl = () => {
 
             {/* Campo para ingresar la URL */}
             <div style={{ marginBottom: '10px' }}>
-                <label>🔗 URL del audio:</label>
+                <label>URL del audio:</label>
                 <br />
                 <input
                     type="text"
@@ -75,7 +77,7 @@ const RobotAudioControl = () => {
                     opacity: !audioUrl.trim() || !audioService ? 0.5 : 1
                 }}
             >
-                ▶ Reproducir Audio
+                Reproducir Audio
             </button>
         </div>
     );
