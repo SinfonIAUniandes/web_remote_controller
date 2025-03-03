@@ -1,3 +1,5 @@
+//audio que sirve: http://audio-edge-es6pf.mia.g.radiomast.io/ref-128k-mp3-stereo
+
 import React, { useState } from 'react';
 import { useRos } from '../contexts/RosContext';
 import { createService } from '../services/RosManager';
@@ -9,11 +11,11 @@ const RobotAudioControl = () => {
 
     // Servicios de ROS para reproducir y detener audio
     const audioService = ros 
-        ? createService(ros, '/pytoolkit/ALAudioPlayer/play_audio_stream_srv', 'robot_toolkit_msgs/set_stiffnesses_srv')
+        ? createService(ros, '/pytoolkit/ALAudioPlayer/play_audio_stream_srv','/robot_toolkit_msgs/set_stiffnesses_sev')
         : null;
 
     const stopAudioService = ros 
-        ? createService(ros, '/pytoolkit/ALAudioPlayer/stop_audio_srv', 'std_srvs/Empty') // SIN PARÁMETROS
+        ? createService(ros, '/pytoolkit/ALAudioPlayer/stop_audio_stream_srv', 'std_srvs/Empty') // SIN PARÁMETROS
         : null;
 
     // Enviar URL de audio al robot
