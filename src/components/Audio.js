@@ -1,10 +1,3 @@
-//https://audio-edge-es6pf.mia.g.radiomast.io/ref-128k-mp3-stereo
-//https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand3.wav
-//https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav
-//https://www2.cs.uic.edu/~i101/SoundFiles/ImperialMarch60.wav
-//http://audio-edge-es6pf.mia.g.radiomast.io/ref-128k-mp3-stereo
-
-
 import React, { useState } from 'react';
 import { useRos } from '../contexts/RosContext';
 import { createService } from '../services/RosManager';
@@ -14,9 +7,13 @@ const RobotAudioControl = () => {
     const { ros } = useRos();
     const [audioUrl, setAudioUrl] = useState("");
 
-    // Verificamos que ROS esté disponible antes de crear el servicio
+    // Servicios de ROS para reproducir y detener audio
     const audioService = ros 
         ? createService(ros, '/pytoolkit/ALAudioPlayer/play_audio_stream_srv', 'robot_toolkit_msgs/set_stiffnesses_srv')
+        : null;
+
+    const stopAudioService = ros 
+        ? createService(ros, '/pytoolkit/ALAudioPlayer/stop_audio_srv', 'robot_toolkit_msgs/set_stiffnesses_srv')
         : null;
 
     // Enviar URL de audio al robot
@@ -34,7 +31,7 @@ const RobotAudioControl = () => {
         // Crear mensaje ROS con la URL del audio
         const request = new ROSLIB.ServiceRequest({
             names: audioUrl,  // El servicio espera 'names' como parámetro
-            stiffnesses: 1.0         // Configuración para reproducción en bucle (ajústalo si es necesario)
+            stiffnesses: 1.0  // Configuración para reproducción
         });
 
         // Enviar mensaje ROS al servicio
@@ -45,9 +42,27 @@ const RobotAudioControl = () => {
         });
     };
 
+    // Detener audio en el robot
+    const handleStopAudio = () => {
+        if (!stopAudioService) {
+            alert("Error: No hay conexión con ROS.");
+            return;
+        }
+
+        // Crear mensaje ROS para detener el audio
+        const stopRequest = new ROSLIB.ServiceRequest({});
+
+        // Enviar solicitud de detener audio
+        stopAudioService.callService(stopRequest, (result) => {
+            console.log('Deteniendo audio en el robot:', result);
+        }, (error) => {
+            console.error('Error al detener el audio:', error);
+        });
+    };
+
     return (
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <h2>🎵 Reproducir Audio en el Robot</h2>
+            <h2>Reproducir Audio en el Robot</h2>
 
             {/* Campo para ingresar la URL */}
             <div style={{ marginBottom: '10px' }}>
@@ -68,24 +83,43 @@ const RobotAudioControl = () => {
                 />
             </div>
 
-            {/* Botón para reproducir el audio */}
-            <button 
-                onClick={handlePlayUrl} 
-                disabled={!audioUrl.trim() || !audioService}
-                style={{
-                    padding: '10px 15px',
-                    fontSize: '16px',
-                    backgroundColor: '#007BFF',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    marginTop: '10px',
-                    opacity: !audioUrl.trim() || !audioService ? 0.5 : 1
-                }}
-            >
-                Reproducir Audio
-            </button>
+            {/* Botones para reproducir y detener audio */}
+            <div style={{ marginTop: '10px' }}>
+                <button 
+                    onClick={handlePlayUrl} 
+                    disabled={!audioUrl.trim() || !audioService}
+                    style={{
+                        padding: '10px 15px',
+                        fontSize: '16px',
+                        backgroundColor: '#007BFF',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        marginRight: '10px',
+                        opacity: !audioUrl.trim() || !audioService ? 0.5 : 1
+                    }}
+                >
+                    Reproducir Audio
+                </button>
+
+                <button 
+                    onClick={handleStopAudio} 
+                    disabled={!stopAudioService}
+                    style={{
+                        padding: '10px 15px',
+                        fontSize: '16px',
+                        backgroundColor: '#DC3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        opacity: !stopAudioService ? 0.5 : 1
+                    }}
+                >
+                    Detener Audio
+                </button>
+            </div>
         </div>
     );
 };
