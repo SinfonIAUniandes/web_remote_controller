@@ -8,36 +8,50 @@ const RobotAudioControl = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const audioService = createService(ros, '/robot_toolkit/audio_tools_srv', 'robot_toolkit_msgs/audio_tools_srv');
 
-    // ✅ Manejar selección de archivo
+    // Función para manejar la selección del archivo
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
     };
 
-    // ✅ Enviar el archivo al robot y reproducirlo
-    const handlePlayAudio = () => {
+    // Función para enviar el archivo al robot
+    const handlePlayAudio = async () => {
         if (!selectedFile) {
-            alert("Por favor, seleccione un archivo de audio.");
+            alert("Seleccione un archivo de audio.");
             return;
         }
 
-        // Leer el archivo y enviarlo como mensaje ROS
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const audioData = new Uint8Array(e.target.result);
+        // Crear objeto FormData para subir el archivo
+        const formData = new FormData();
+        formData.append("audio_file", selectedFile, "audio_temp.wav");
 
+        try {
+            const uploadResponse = await fetch("http://ROBOT_IP:5000/upload_audio", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error("Error al subir el archivo al robot.");
+            }
+
+            const uploadData = await uploadResponse.json();
+            console.log("Archivo subido:", uploadData);
+
+            // Enviar mensaje ROS para reproducir el archivo
             const message = new ROSLIB.Message({
                 command: "play_audio",
-                data: [...audioData]
+                file_path: uploadData.file_path // Ruta del archivo en el robot
             });
 
             audioService.callService(message, (result) => {
-                console.log('Audio enviado al robot:', result);
+                console.log('Reproduciendo audio en el robot:', result);
             }, (error) => {
-                console.error('Error al enviar el audio:', error);
+                console.error('Error al reproducir el audio:', error);
             });
-        };
 
-        reader.readAsArrayBuffer(selectedFile);
+        } catch (error) {
+            console.error("Error:", error);
+        }
     };
 
     return (
