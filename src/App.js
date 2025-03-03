@@ -9,6 +9,7 @@ import Battery from './components/Battery';
 import Volumen from './components/Volumen';
 import Texto from './components/Texto';
 import Animaciones from './components/Animaciones';
+import Audio from './components/Audio';
 
 const App = () => {
     return (
@@ -30,6 +31,8 @@ const App = () => {
             <Volumen />
             <h1>Animaciones</h1>
             <Animaciones />
+            <h1>Audio</h1>
+            <Audio />
         </div>
     );
 };
