@@ -1,81 +1,56 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRos } from "../contexts/RosContext";
 import { createService } from "../services/RosManager";
 import * as ROSLIB from "roslib";
 
 const RobotAudioPlayer = () => {
     const { ros } = useRos();
-    const [playing, setPlaying] = useState(false);
-    const [volume, setVolume] = useState(50);
-    const [filePath, setFilePath] = useState("");
+    const [selectedFile, setSelectedFile] = useState(null);
 
-    // Configura el servicio de audio cuando ROS esté disponible
-    useEffect(() => {
-        if (ros) {
-            const enableAudioService = createService(ros, "/robot_toolkit/audio_tools_srv", "robot_toolkit_msgs/audio_tools_srv");
-            const request = { command: "enable_audio" };
-
-            enableAudioService.callService(request, (result) => {
-                console.log("Servicio de audio inicializado:", result);
-            }, (error) => {
-                console.error("Error inicializando servicio de audio:", error);
-            });
-        }
-    }, [ros]);
-
-    // Función para reproducir un archivo de audio
-    const handlePlay = () => {
-        if (!filePath) {
-            alert("Por favor, ingresa la ruta de un archivo de audio.");
-            return;
-        }
-
-        if (ros) {
-            const audioService = createService(ros, "/robot_toolkit/audio_tools_srv", "robot_toolkit_msgs/audio_tools_srv");
-            const request = { command: "play_audio", file_path: filePath }; // Aquí se envía el archivo
-
-            audioService.callService(request, (result) => {
-                console.log("Audio reproduciéndose:", result);
-                setPlaying(true);
-            }, (error) => {
-                console.error("Error al reproducir el audio:", error);
-            });
+    // Maneja la carga del archivo desde el PC
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file && file.type === "audio/mp3") {
+            setSelectedFile(file);
+        } else {
+            alert("Por favor, selecciona un archivo MP3 válido.");
         }
     };
 
-    // Función para ajustar el volumen
-    const handleVolumeChange = (event) => {
-        const newVolume = parseInt(event.target.value, 10);
-        setVolume(newVolume);
-
-        if (ros) {
-            const volumeService = createService(ros, "/pytoolkit/ALAudioDevice/set_output_volume_srv", "robot_toolkit_msgs/set_output_volume_srv");
-            const request = { volume: newVolume };
-
-            volumeService.callService(request, (result) => {
-                console.log("Volumen actualizado:", result);
-            }, (error) => {
-                console.error("Error al actualizar volumen:", error);
-            });
+    // Envía el archivo al robot para que lo reproduzca
+    const handlePlay = async () => {
+        if (!selectedFile) {
+            alert("Por favor, selecciona un archivo MP3 para reproducir.");
+            return;
         }
+
+        // Convierte el archivo en Base64 para enviarlo como string
+        const reader = new FileReader();
+        reader.readAsDataURL(selectedFile);
+        reader.onload = () => {
+            const base64Audio = reader.result.split(",")[1]; // Se obtiene solo la parte de datos
+
+            if (ros) {
+                const audioService = createService(ros, "/robot_toolkit/audio_tools_srv", "robot_toolkit_msgs/audio_tools_srv");
+                const request = { command: "play_audio", file_data: base64Audio };
+
+                audioService.callService(request, (result) => {
+                    console.log("Audio enviado para reproducción:", result);
+                }, (error) => {
+                    console.error("Error al reproducir el audio:", error);
+                });
+            }
+        };
+        reader.onerror = (error) => {
+            console.error("Error al leer el archivo:", error);
+        };
     };
 
     return (
         <div style={{ textAlign: "center" }}>
             <h2>Reproducir Audio en el Robot</h2>
-            <div>
-                <input 
-                    type="text" 
-                    value={filePath} 
-                    onChange={(e) => setFilePath(e.target.value)} 
-                    placeholder="Ruta del archivo de audio"
-                />
-                <button onClick={handlePlay} disabled={playing}>Reproducir</button>
-            </div>
-            <div>
-                <label>Volumen: {volume}</label>
-                <input type="range" min="0" max="100" value={volume} onChange={handleVolumeChange} />
-            </div>
+            <input type="file" accept="audio/mp3" onChange={handleFileChange} />
+            <button onClick={handlePlay} disabled={!selectedFile}>Reproducir</button>
         </div>
     );
 };
