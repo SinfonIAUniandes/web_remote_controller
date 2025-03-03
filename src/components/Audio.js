@@ -13,7 +13,7 @@ const RobotAudioControl = () => {
         : null;
 
     const stopAudioService = ros 
-        ? createService(ros, '/pytoolkit/ALAudioPlayer/stop_audio_srv', 'robot_toolkit_msgs/set_stiffnesses_srv')
+        ? createService(ros, '/pytoolkit/ALAudioPlayer/stop_audio_srv', 'std_srvs/Empty') // SIN PARÁMETROS
         : null;
 
     // Enviar URL de audio al robot
@@ -42,14 +42,14 @@ const RobotAudioControl = () => {
         });
     };
 
-    // Detener audio en el robot
+    // Detener audio en el robot (SIN PARÁMETROS)
     const handleStopAudio = () => {
         if (!stopAudioService) {
             alert("Error: No hay conexión con ROS.");
             return;
         }
 
-        // Crear mensaje ROS para detener el audio
+        // Crear mensaje vacío para el servicio stop
         const stopRequest = new ROSLIB.ServiceRequest({});
 
         // Enviar solicitud de detener audio
@@ -62,7 +62,7 @@ const RobotAudioControl = () => {
 
     return (
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <h2>Reproducir Audio en el Robot</h2>
+            <h2>Reproducir audio en el Robot</h2>
 
             {/* Campo para ingresar la URL */}
             <div style={{ marginBottom: '10px' }}>
