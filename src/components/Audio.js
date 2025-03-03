@@ -9,7 +9,7 @@ const RobotAudioControl = () => {
 
     // Verificamos que ROS esté disponible antes de crear el servicio
     const audioService = ros 
-        ? createService(ros, '/pytoolkit/ALAudioPlayer' , '/pytoolkit/ALAudioPlayer/play_audio_stream_srv')
+        ? createService(ros, '/pytoolkit/ALAudio', 'robot_toolkit_msgs/set_stiffnesses_srv')
         : null;
 
     // Enviar URL de audio al robot
