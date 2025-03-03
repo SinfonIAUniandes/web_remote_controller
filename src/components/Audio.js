@@ -26,7 +26,7 @@ const RobotAudioControl = () => {
 
         // Crear mensaje ROS con la URL del audio
         const request = new ROSLIB.ServiceRequest({
-            name: audioUrl,  // El servicio espera 'name' como parámetro
+            names: audioUrl,  // El servicio espera 'names' como parámetro
             stiffnesses: 1.0         // Configuración para reproducción en bucle (ajústalo si es necesario)
         });
 
