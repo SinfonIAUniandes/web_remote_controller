@@ -38,9 +38,9 @@ const RobotAnimationControl = () => {
                 });
 
                 setAnimations(parsedAnimations);
-                console.log("✅ Animaciones procesadas correctamente:", parsedAnimations);
+                console.log("Animaciones procesadas correctamente:", parsedAnimations);
             })
-            .catch(error => console.error("❌ Error al cargar las animaciones:", error));
+            .catch(error => console.error("Error al cargar las animaciones:", error));
     }, []);
 
     const handleAnimation = () => {
@@ -59,9 +59,9 @@ const RobotAnimationControl = () => {
 
         if (animationTopic) {
             animationTopic.publish(message);
-            console.log(`✅ Animación enviada: ${fullAnimationPath}`);
+            console.log(`Animación enviada: ${fullAnimationPath}`);
         } else {
-            console.error("❌ El publicador de animaciones no está disponible.");
+            console.error("El publicador de animaciones no está disponible.");
         }
     };
 
