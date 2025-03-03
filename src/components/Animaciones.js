@@ -1,102 +1,110 @@
-import React, { useEffect, useState } from "react";
-import { useRos } from "../contexts/RosContext";
-import { createTopic, createService } from "../services/RosManager";
-import * as ROSLIB from "roslib";
-
-// Importar animaciones desde el archivo de texto
-const loadAnimations = async () => {
-  const response = await fetch("/animations/animations.txt");
-  const text = await response.text();
-  return text.split("\n").filter((line) => line.trim() !== "");
-};
+import React, { useEffect, useState } from 'react';
+import { useRos } from '../contexts/RosContext';
+import { createTopic, createService } from '../services/RosManager';
+import * as ROSLIB from 'roslib';
+import animationsData from '../animations/animations.txt';
 
 const RobotAnimationControl = () => {
-  const { ros } = useRos();
-  const [animations, setAnimations] = useState({});
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedSubcategory, setSelectedSubcategory] = useState("");
-  const [selectedAnimation, setSelectedAnimation] = useState("");
+    const { ros } = useRos();
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedSubcategory, setSelectedSubcategory] = useState('');
+    const [selectedAnimation, setSelectedAnimation] = useState('');
+    const [animations, setAnimations] = useState({});
+    const animationTopic = createTopic(ros, '/animations', 'robot_toolkit_msgs/animation_msg');
 
-  const animationTopic = createTopic(ros, "/animations", "robot_toolkit_msgs/animation_msg");
+    useEffect(() => {
+        fetch(animationsData)
+            .then(response => response.text())
+            .then(text => {
+                const parsedAnimations = {};
+                text.split('\n').forEach(animation => {
+                    const parts = animation.split('/');
+                    if (parts.length === 3) {
+                        const [category, subcategory, anim] = parts;
+                        if (!parsedAnimations[category]) parsedAnimations[category] = {};
+                        if (!parsedAnimations[category][subcategory]) parsedAnimations[category][subcategory] = [];
+                        parsedAnimations[category][subcategory].push(anim);
+                    }
+                });
+                setAnimations(parsedAnimations);
+            })
+            .catch(error => console.error('Error al cargar las animaciones:', error));
+    }, []);
 
-  useEffect(() => {
-    loadAnimations().then((lines) => {
-      const categories = {};
+    useEffect(() => {
+        if (ros) {
+            const enableMotionService = createService(ros, '/robot_toolkit/motion_tools_srv', 'robot_toolkit_msgs/motion_tools_srv');
+            const motionRequest = { data: { command: "enable_all" } };
 
-      lines.forEach((line) => {
-        const parts = line.split("/");
-        if (parts.length >= 2) {
-          const [category, subcategory, animation] = parts;
-          if (!categories[category]) categories[category] = {};
-          if (!categories[category][subcategory]) categories[category][subcategory] = [];
-          categories[category][subcategory].push(line);
+            enableMotionService.callService(motionRequest, (result) => {
+                console.log('Motion tools service initialized:', result);
+            }, (error) => {
+                console.error('Error initializing motion service:', error);
+            });
         }
-      });
+    }, [ros]);
 
-      setAnimations(categories);
-    });
-  }, []);
+    const handleAnimation = () => {
+        if (!selectedCategory || !selectedSubcategory || !selectedAnimation) {
+            alert("Seleccione una animación para ejecutar.");
+            return;
+        }
 
-  const handleAnimation = () => {
-    if (!selectedAnimation) {
-      alert("Seleccione una animación para ejecutar.");
-      return;
-    }
+        const fullAnimationPath = `${selectedCategory}/${selectedSubcategory}/${selectedAnimation}`;
+        const message = new ROSLIB.Message({ family: "animations", animation_name: fullAnimationPath });
 
-    const message = new ROSLIB.Message({
-      family: "animations",
-      animation_name: selectedAnimation,
-    });
+        if (animationTopic) {
+            animationTopic.publish(message);
+            console.log(`Animación enviada: ${fullAnimationPath}`);
+        } else {
+            console.error("El publicador de animaciones no está disponible.");
+        }
+    };
 
-    if (animationTopic) {
-      animationTopic.publish(message);
-      console.log(`Animación enviada: ${selectedAnimation}`);
-    } else {
-      console.error("El publicador de animaciones no está disponible.");
-    }
-  };
-
-  return (
-    <div style={{ textAlign: "center" }}>
-      <h2>Control de Animaciones del Robot</h2>
-
-      {/* Seleccionar categoría */}
-      <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-        <option value="">Seleccione una categoría</option>
-        {Object.keys(animations).map((category) => (
-          <option key={category} value={category}>
-            {category}
-          </option>
-        ))}
-      </select>
-
-      {/* Seleccionar subcategoría */}
-      {selectedCategory && animations[selectedCategory] && (
-        <select value={selectedSubcategory} onChange={(e) => setSelectedSubcategory(e.target.value)}>
-          <option value="">Seleccione una subcategoría</option>
-          {Object.keys(animations[selectedCategory]).map((subcategory) => (
-            <option key={subcategory} value={subcategory}>
-              {subcategory}
-            </option>
-          ))}
-        </select>
-      )}
-
-      {/* Seleccionar animación */}
-      {selectedSubcategory && animations[selectedCategory][selectedSubcategory] && (
-        <select value={selectedAnimation} onChange={(e) => setSelectedAnimation(e.target.value)}>
-          <option value="">Seleccione una animación</option>
-          {animations[selectedCategory][selectedSubcategory].map((animation, index) => (
-            <option key={index} value={animation}>
-              {animation}
-            </option>
-          ))}
-        </select>
-      )}
-
-      <button onClick={handleAnimation}>Ejecutar Animación</button>
-    </div>
-  );
+    return (
+        <div style={{ textAlign: 'center' }}>
+            <h2>Control de Animaciones del Robot</h2>
+            <div>
+                <label>Categoría:</label>
+                <select value={selectedCategory} onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    setSelectedSubcategory('');
+                    setSelectedAnimation('');
+                }}>
+                    <option value="">Seleccione una categoría</option>
+                    {Object.keys(animations).map(category => (
+                        <option key={category} value={category}>{category}</option>
+                    ))}
+                </select>
+            </div>
+            {selectedCategory && (
+                <div>
+                    <label>Subcategoría:</label>
+                    <select value={selectedSubcategory} onChange={(e) => {
+                        setSelectedSubcategory(e.target.value);
+                        setSelectedAnimation('');
+                    }}>
+                        <option value="">Seleccione una subcategoría</option>
+                        {Object.keys(animations[selectedCategory] || {}).map(subcategory => (
+                            <option key={subcategory} value={subcategory}>{subcategory}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
+            {selectedSubcategory && (
+                <div>
+                    <label>Animación:</label>
+                    <select value={selectedAnimation} onChange={(e) => setSelectedAnimation(e.target.value)}>
+                        <option value="">Seleccione una animación</option>
+                        {(animations[selectedCategory]?.[selectedSubcategory] || []).map(anim => (
+                            <option key={anim} value={anim}>{anim}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
+            <button onClick={handleAnimation} disabled={!selectedAnimation}>Ejecutar Animación</button>
+        </div>
+    );
 };
 
 export default RobotAnimationControl;
