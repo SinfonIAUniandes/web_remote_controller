@@ -6,6 +6,10 @@ import * as ROSLIB from "roslib";
 const RobotAnimationControl = () => {
     const { ros } = useRos();
     const [animations, setAnimations] = useState({});
+    const [categories, setCategories] = useState([]);
+    const [subcategories, setSubcategories] = useState([]);
+    const [animationList, setAnimationList] = useState([]);
+
     const [selectedCategory, setSelectedCategory] = useState("");
     const [selectedSubcategory, setSelectedSubcategory] = useState("");
     const [selectedAnimation, setSelectedAnimation] = useState("");
@@ -17,16 +21,26 @@ const RobotAnimationControl = () => {
             .then(response => response.text())
             .then(text => {
                 const parsedAnimations = {};
-                text.split("\n").forEach(animation => {
-                    const parts = animation.trim().split("/");
+                const categorySet = new Set();
+
+                text.split("\n").forEach(line => {
+                    const parts = line.trim().split("/");
                     if (parts.length >= 3) {
-                        const [category, subcategory, anim] = parts;
-                        if (!parsedAnimations[category]) parsedAnimations[category] = {};
-                        if (!parsedAnimations[category][subcategory]) parsedAnimations[category][subcategory] = [];
-                        parsedAnimations[category][subcategory].push(anim);
+                        const [category, subcategory, animation] = parts;
+                        
+                        if (!parsedAnimations[category]) {
+                            parsedAnimations[category] = {};
+                            categorySet.add(category);
+                        }
+                        if (!parsedAnimations[category][subcategory]) {
+                            parsedAnimations[category][subcategory] = [];
+                        }
+                        parsedAnimations[category][subcategory].push(animation);
                     }
                 });
+
                 setAnimations(parsedAnimations);
+                setCategories(Array.from(categorySet));
             })
             .catch(error => console.error("Error al cargar las animaciones:", error));
     }, []);
@@ -43,6 +57,22 @@ const RobotAnimationControl = () => {
             });
         }
     }, [ros]);
+
+    // Cuando cambia la categoría, actualiza las subcategorías disponibles
+    const handleCategoryChange = (category) => {
+        setSelectedCategory(category);
+        setSelectedSubcategory("");
+        setSelectedAnimation("");
+        setSubcategories(category ? Object.keys(animations[category] || {}) : []);
+        setAnimationList([]);
+    };
+
+    // Cuando cambia la subcategoría, actualiza la lista de animaciones disponibles
+    const handleSubcategoryChange = (subcategory) => {
+        setSelectedSubcategory(subcategory);
+        setSelectedAnimation("");
+        setAnimationList(subcategory ? (animations[selectedCategory]?.[subcategory] || []) : []);
+    };
 
     const handleAnimation = () => {
         if (!selectedCategory || !selectedSubcategory || !selectedAnimation) {
@@ -68,14 +98,10 @@ const RobotAnimationControl = () => {
                 <label>Categoría:</label>
                 <select
                     value={selectedCategory}
-                    onChange={(e) => {
-                        setSelectedCategory(e.target.value);
-                        setSelectedSubcategory("");
-                        setSelectedAnimation("");
-                    }}
+                    onChange={(e) => handleCategoryChange(e.target.value)}
                 >
                     <option value="">Seleccione una categoría</option>
-                    {Object.keys(animations).map(category => (
+                    {categories.map(category => (
                         <option key={category} value={category}>{category}</option>
                     ))}
                 </select>
@@ -85,13 +111,10 @@ const RobotAnimationControl = () => {
                     <label>Subcategoría:</label>
                     <select
                         value={selectedSubcategory}
-                        onChange={(e) => {
-                            setSelectedSubcategory(e.target.value);
-                            setSelectedAnimation("");
-                        }}
+                        onChange={(e) => handleSubcategoryChange(e.target.value)}
                     >
                         <option value="">Seleccione una subcategoría</option>
-                        {Object.keys(animations[selectedCategory] || {}).map(subcategory => (
+                        {subcategories.map(subcategory => (
                             <option key={subcategory} value={subcategory}>{subcategory}</option>
                         ))}
                     </select>
@@ -105,7 +128,7 @@ const RobotAnimationControl = () => {
                         onChange={(e) => setSelectedAnimation(e.target.value)}
                     >
                         <option value="">Seleccione una animación</option>
-                        {(animations[selectedCategory]?.[selectedSubcategory] || []).map(anim => (
+                        {animationList.map(anim => (
                             <option key={anim} value={anim}>{anim}</option>
                         ))}
                     </select>
