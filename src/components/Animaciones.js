@@ -17,17 +17,25 @@ const RobotAnimationControl = () => {
     const animationTopic = createTopic(ros, "/animations", "robot_toolkit_msgs/animation_msg");
 
     useEffect(() => {
+        console.log("Iniciando carga de animations.txt...");
         fetch("/animations/animations.txt")
             .then(response => response.text())
             .then(text => {
+                console.log("Contenido de animations.txt recibido:", text);
                 const parsedAnimations = {};
                 const categorySet = new Set();
 
-                text.split("\n").forEach(line => {
-                    const parts = line.trim().split("/");
+                text.split("\n").forEach((line, index) => {
+                    line = line.trim();
+                    if (!line) return;
+
+                    const parts = line.split("/");
+                    console.log(`Procesando línea ${index}: `, parts);
+
                     if (parts.length >= 3) {
-                        const [category, subcategory, animation] = parts;
-                        
+                        const [category, subcategory, ...animationParts] = parts;
+                        const animation = animationParts.join("/");
+
                         if (!parsedAnimations[category]) {
                             parsedAnimations[category] = {};
                             categorySet.add(category);
@@ -39,6 +47,7 @@ const RobotAnimationControl = () => {
                     }
                 });
 
+                console.log("Estructura final de animations:", parsedAnimations);
                 setAnimations(parsedAnimations);
                 setCategories(Array.from(categorySet));
             })
@@ -47,6 +56,7 @@ const RobotAnimationControl = () => {
 
     useEffect(() => {
         if (ros) {
+            console.log("Inicializando Motion Tools Service...");
             const enableMotionService = createService(ros, "/robot_toolkit/motion_tools_srv", "robot_toolkit_msgs/motion_tools_srv");
             const motionRequest = { data: { command: "enable_all" } };
 
@@ -58,8 +68,8 @@ const RobotAnimationControl = () => {
         }
     }, [ros]);
 
-    // Cuando cambia la categoría, actualiza las subcategorías disponibles
     const handleCategoryChange = (category) => {
+        console.log(`Categoría seleccionada: ${category}`);
         setSelectedCategory(category);
         setSelectedSubcategory("");
         setSelectedAnimation("");
@@ -67,8 +77,8 @@ const RobotAnimationControl = () => {
         setAnimationList([]);
     };
 
-    // Cuando cambia la subcategoría, actualiza la lista de animaciones disponibles
     const handleSubcategoryChange = (subcategory) => {
+        console.log(`Subcategoría seleccionada: ${subcategory}`);
         setSelectedSubcategory(subcategory);
         setSelectedAnimation("");
         setAnimationList(subcategory ? (animations[selectedCategory]?.[subcategory] || []) : []);
@@ -81,6 +91,8 @@ const RobotAnimationControl = () => {
         }
 
         const fullAnimationPath = `${selectedCategory}/${selectedSubcategory}/${selectedAnimation}`;
+        console.log(`Enviando animación: ${fullAnimationPath}`);
+
         const message = new ROSLIB.Message({ family: "animations", animation_name: fullAnimationPath });
 
         if (animationTopic) {
