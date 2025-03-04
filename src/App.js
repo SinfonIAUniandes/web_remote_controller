@@ -5,7 +5,7 @@ import Leds from './components/Leds'
 import Base from './components/Base'
 import Navegador from './components/Navegador';
 import Imagen from './components/Imagen';
-
+import RobotSecurity from './components/RobotSecurity';
 
 const App = () => {
     return (
@@ -22,7 +22,7 @@ const App = () => {
 
             
             <h1>Control de Seguridad</h1>
-            <SecurityControl />
+            <RobotSecurity />
         </div>
     );
 };

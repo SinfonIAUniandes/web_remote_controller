@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRos } from '../contexts/RosContext';
+import { createTopic, createService } from '../services/RosManager';
 import * as ROSLIB from 'roslib';
 
 //Componente para habilitar o deshabilitar la seguridad del robot
@@ -9,16 +10,10 @@ const SecurityControl = () => {
     //Función para llamar al servicio
     const toggleSecurity = (enable) => {
         if (ros) {
-            const service = new ROSLIB.Service({
-                ros: ros,
-                name: '/pytoolkit/ALMotion/enable_security_srv', //Nombre del servicio
-                serviceType: 'std_srvs/SetBool', //Tipo de mensaje que hay que mandarle al servicio
-            });
+            const service = createService(ros,'/pytoolkit/ALMotion/enable_security_srv','robot_toolkit_msgs/battery_service_srv');
 
-            //Crear la solicitud con el valor true/false para activar/desactivar
-            const request = new ROSLIB.ServiceRequest({
-                data: enable, //true para habilitar, false para deshabilitar
-            });
+            //Crear la solicitud con el valor true/false para activar/desactivar -> NO PORQ NO PIDE NADA DE ARGUMENTO
+            const request = {};
 
             //Llamar al servicio
             service.callService(request, (result) => {
