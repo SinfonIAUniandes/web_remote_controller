@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRos } from '../contexts/RosContext';
+import { createTopic, createService } from '../services/RosManager';
 import * as ROSLIB from 'roslib';
 
 //Componente para esconder lo que se ve en la tablet del robot
@@ -9,18 +10,15 @@ const HideTabletScreen = () => {
     //Función para llamar al servicio y ocultar lo que este en la pantalla
     const hideScreen = () => {
         if (ros) {
-            //Crear el cliente (o suscriptor) del servicio
-            const hideScreenService = new ROSLIB.Service({
-                ros: ros,
-                name: '/pytoolkit/ALTabletService/hide_srv', // Nombre del servicio
-                serviceType: 'std_srvs/Empty' // Asumiendo que usa un mensaje vacío estándar ??, hay que ver
-            });
 
-            //Crear una solicitud vacía (std_srvs/Empty no requiere parámetros, es vacio precisamente)
-            const request = new ROSLIB.ServiceRequest({});
+            const hideScreenService  = createService(ros, '/pytoolkit/ALTabletService/hide_srv', 'robot_toolkit_msgs/battery_service_srv');
+
+            const hideScreenRequest = {
+            };
+
 
             //Llamar al servicio
-            hideScreenService.callService(request, (result) => {
+            hideScreenService.callService(hideScreenRequest , (result) => {
                 console.log('Pantalla de la tablet oculta. Respuesta del servicio:', result);
             });
         } 
