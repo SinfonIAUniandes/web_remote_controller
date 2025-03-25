@@ -12,6 +12,7 @@ import Texto from './components/Texto';
 import BreathingControl from './components/BreathingControl';
 import AutonomousLifeControl from './components/AutonomousLifeControl';
 import TrackerControl from  './components/TrackerControl';
+import ShowWordsTablet from  './components/ShowWordsTablet';
 
 const App = () => {
     return (
@@ -35,6 +36,8 @@ const App = () => {
             <AutonomousLifeControl />
             <h1>Control del Tracker</h1 >
             <TrackerControl />
+            <h1>Ver en tablet qué dice el robot</h1 >
+            <ShowWordsTablet />
         </div>
     );
 };
