@@ -9,6 +9,9 @@ import Battery from './components/Battery';
 import Volumen from './components/Volumen';
 import Texto from './components/Texto';
 
+import BreathingControl from './components/BreathingControl';
+import AutonomousLifeControl from './components/AutonomousLifeControl';
+
 const App = () => {
     return (
         <div className="App">
@@ -25,6 +28,10 @@ const App = () => {
             <Battery />
             <h1>Volumen</h1>
             <Volumen />
+            <h1>Control de Respiración</h1>
+            <BreathingControl />
+            <h1>Modo Autónomo</h1>
+            <AutonomousLifeControl />
         </div>
     );
 };
