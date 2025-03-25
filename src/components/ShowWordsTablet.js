@@ -4,7 +4,6 @@ import * as ROSLIB from 'roslib';
 
 const ShowWordsTablet = () => {
     const { ros } = useRos();
-    const [tabletText, setTabletText] = useState("Esperando el texto..."); //para poderlo mostrar en la pagina web
 
     const fetchTabletText = () => {
         if (ros) {
@@ -17,8 +16,7 @@ const ShowWordsTablet = () => {
             const request = new ROSLIB.ServiceRequest({}); //no args
 
             service.callService(request, (result) => {
-                console.log("El texto en la tablet es:", result.message);
-                setTabletText(result.message); //actualizar el texto en la interfaz para saber que dice
+
             });
         }
     };
@@ -26,8 +24,7 @@ const ShowWordsTablet = () => {
     return (
         <div>
             <h2>Texto en la Tablet</h2>
-            <p>{tabletText}</p> 
-            <button onClick={fetchTabletText}>Mostrar texto actual</button>
+            <button onClick={fetchTabletText}>Mostrar texto en pantalla</button>
         </div>
     );
 };
