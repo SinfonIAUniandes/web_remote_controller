@@ -1,36 +1,62 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRos } from '../contexts/RosContext';
+import { createTopic, createService } from '../services/RosManager';
 import * as ROSLIB from 'roslib';
 
-const TrackerControl = () => {
+const RobotAudioControl = () => {
     const { ros } = useRos();
-    const [trackerState, setTrackerState] = useState("Off");
+    const [text, setText] = useState('');
+    const [language, setLanguage] = useState('Spanish');
+    const speechTopic = createTopic(ros, '/speech', 'robot_toolkit_msgs/speech_msg');
 
-    const toggleTracker = (enable) => {
+    useEffect(() => {
         if (ros) {
-            const service = new ROSLIB.Service({
-                ros: ros,
-                name: enable ? '/pytoolkit/ALTracker/start_tracker_srv' : '/pytoolkit/ALTracker/stop_tracker_srv', //Servicio dependiendo de lo que quiero hacer
-                serviceType: 'robot_toolkit_msgs/battery_service_srv', //Tipo mensaje
+            const enableAudioService = createService(ros, '/robot_toolkit/audio_tools_srv', 'robot_toolkit_msgs/audio_tools_srv');
+            const audioRequest = {
+                data: { command: "enable_tts" }
+            };
+            enableAudioService.callService(audioRequest, (result) => {
+                console.log('Audio tools service initialized:', result);
+            }, (error) => {
+                console.error('Error initializing audio service:', error);
             });
+        }
+    }, [ros]);
 
-            const request = new ROSLIB.ServiceRequest({}); //No armo nada, no necesita
 
-            service.callService(request, (result) => {
-                console.log(`Tracker ${enable ? 'encendido' : 'apagado'}. Respuesta:`, result);
-                setTrackerState(enable ? "On" : "Off");
+    const handleSpeak = () => {
+        if (!text.trim()) {
+            alert("Por favor, ingrese un texto para que el robot hable.");
+            return;
+        }
+
+        if (ros) {
+            const message = new ROSLIB.Message({
+                language: language,
+                text: text,
+                animated: true 
             });
+            speechTopic.publish(message)
         }
     };
 
     return (
-        <div>
-            <h2>Control del Tracker</h2>
-            <p>Estado actual: {trackerState}</p>
-            <button onClick={() => toggleTracker(true)}>Encender Tracker</button>
-            <button onClick={() => toggleTracker(false)}>Apagar Tracker</button>
+        <div style={{ textAlign: 'center' }}>
+            <div>
+                <input
+                    type="text"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Texto para el robot"
+                />
+                <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+                    <option value="Spanish">Español</option>
+                    <option value="English">Inglés</option>
+                </select>
+                <button onClick={handleSpeak}>Hablar</button>
+            </div>
         </div>
     );
 };
 
-export default TrackerControl;
+export default RobotAudioControl;

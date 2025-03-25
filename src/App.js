@@ -11,6 +11,7 @@ import Texto from './components/Texto';
 
 import BreathingControl from './components/BreathingControl';
 import AutonomousLifeControl from './components/AutonomousLifeControl';
+import TrackerControl from  './components/TrackerControl';
 
 const App = () => {
     return (
@@ -32,6 +33,8 @@ const App = () => {
             <BreathingControl />
             <h1>Modo Autónomo</h1>
             <AutonomousLifeControl />
+            <h1>Control del Tracker</h1 >
+            <TrackerControl />
         </div>
     );
 };
