@@ -34,7 +34,7 @@ const LEDController = () => {
                     command: "enable_all"
                 } 
             };
-
+            //Llamar al servicio
             enableMiscService.callService(miscRequest, (result) => {
                 console.log('Misc functionalities service called:', result);
             });
