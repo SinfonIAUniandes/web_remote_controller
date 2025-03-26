@@ -16,6 +16,7 @@ import AutonomousLifeControl from './components/AutonomousLifeControl';
 import TrackerControl from './components/TrackerControl';
 import ShowWordsTablet from './components/ShowWordsTablet';
 import HideTabletScreen from './components/HideTabletScreen';
+import Cabeza from './components/Cabeza';
 
 const App = () => {
     return (
@@ -51,6 +52,8 @@ const App = () => {
             <h1>Audio</h1>
             <Audio />
             <h1>Ocultar pantalla de la tablet</h1>
+            <Cabeza />
+            <h1>Cabeza</h1>
             <HideTabletScreen />
         </div>
     );
