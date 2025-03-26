@@ -25,7 +25,7 @@ const HeadMovementControl = () => {
         }
 
         const message = new ROSLIB.Message({
-            names: ["HeadPitch", "HeadYaw"].map(n => n.encode('ascii')), // opcional
+            names: ["HeadPitch", "HeadYaw"],
             angles: [parseFloat(anglePitch), parseFloat(angleYaw)],
             fraction_max_speed: [parseFloat(speed), parseFloat(speed)]
         });
