@@ -1,65 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRos } from '../contexts/RosContext';
 import { createTopic } from '../services/RosManager';
 import * as ROSLIB from 'roslib';
 
-const MoverCabeza = () => {
+const RobotHeadControl = () => {
     const { ros } = useRos();
-    const [angle0, setAngle0] = useState('');
-    const [angle1, setAngle1] = useState('');
-    const headTopic = ros ? createTopic(ros, '/set_angles', 'robot_toolkit_msgs/set_angles_msg') : null;
+    const [angle0, setAngle0] = useState(0.0);  // Horizontal
+    const [angle1, setAngle1] = useState(0.0);  // Vertical
+    const [headTopic, setHeadTopic] = useState(null);
+
+    useEffect(() => {
+        if (ros) {
+            const topic = createTopic(ros, '/set_angles', 'robot_toolkit_msgs/set_angles_msg');
+            setHeadTopic(topic);
+        }
+    }, [ros]);
 
     const handleMoveHead = () => {
-        if (!angle0 || !angle1) {
-            alert("Ingrese ambos ángulos.");
-            return;
-        }
-
         if (!headTopic) {
-            alert("Error: No hay conexión con ROS.");
+            alert("No hay conexión con ROS.");
             return;
         }
 
-        const message = new ROSLIB.Message({
-            joint_names: ["HeadYaw", "HeadPitch"],
-            joint_angles: [parseFloat(angle0), parseFloat(angle1)],
-            speed: 0.3,
-            relative: false
+        const msg = new ROSLIB.Message({
+            names: ["HeadYaw", "HeadPitch"],
+            angles: [parseFloat(angle0), parseFloat(angle1)],
+            speed: 0.1
         });
 
-        headTopic.publish(message);
-        console.log("Moviendo cabeza con ángulos:", message);
+        headTopic.publish(msg);
+        console.log("Mensaje enviado para mover la cabeza:", msg);
     };
 
     return (
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <h2>🧠 Mover Cabeza del Robot</h2>
+            <h2>🧠 Controlar Cabeza del Robot</h2>
 
-            <div>
-                <label>Ángulo Horizontal (HeadYaw):</label>
+            <div style={{ marginBottom: '10px' }}>
+                <label>Ángulo Horizontal (Yaw): </label>
                 <input
                     type="number"
+                    step="0.1"
                     value={angle0}
                     onChange={(e) => setAngle0(e.target.value)}
-                    placeholder="Ej. 0.5"
-                    style={{ margin: '5px' }}
                 />
             </div>
-            <div>
-                <label>Ángulo Vertical (HeadPitch):</label>
+
+            <div style={{ marginBottom: '10px' }}>
+                <label>Ángulo Vertical (Pitch): </label>
                 <input
                     type="number"
+                    step="0.1"
                     value={angle1}
                     onChange={(e) => setAngle1(e.target.value)}
-                    placeholder="Ej. -0.3"
-                    style={{ margin: '5px' }}
                 />
             </div>
-            <button
+
+            <button 
                 onClick={handleMoveHead}
                 style={{
                     padding: '10px 15px',
-                    marginTop: '10px',
+                    fontSize: '16px',
                     backgroundColor: '#28a745',
                     color: 'white',
                     border: 'none',
@@ -73,4 +74,4 @@ const MoverCabeza = () => {
     );
 };
 
-export default MoverCabeza;
+export default RobotHeadControl;
