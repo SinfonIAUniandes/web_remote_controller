@@ -21,7 +21,9 @@ const HeadMovementControl = () => {
                 'robot_toolkit_msgs/motion_tools_srv'
             );
 
-            const request = new ROSLIB.ServiceRequest(); // sin argumentos
+            const request = {
+                data: { command: "enable_all" }
+              };
 
             motionService.callService(request,
                 (result) => {
@@ -52,7 +54,7 @@ const HeadMovementControl = () => {
         });
 
         headTopic.publish(message);
-        console.log("📤 Moviendo cabeza:", message);
+        console.log("Moviendo cabeza:", message);
     };
 
     return (
