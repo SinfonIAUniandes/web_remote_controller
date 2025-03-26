@@ -5,9 +5,11 @@ import * as ROSLIB from 'roslib';
 
 const HeadMovementControl = () => {
     const { ros } = useRos();
-    const [anglePitch, setAnglePitch] = useState('');
-    const [angleYaw, setAngleYaw] = useState('');
-    const [speed, setSpeed] = useState('0.1');
+    const [pitch, setPitch] = useState(0);  // HeadPitch
+    const [yaw, setYaw] = useState(0);      // HeadYaw
+    const speed = 0.1;
+    const STEP = 0.05;
+    const MAX = 1.57;  // 90 grados en radianes
 
     const headTopic = ros
         ? createTopic(ros, '/set_angles', 'robot_toolkit_msgs/set_angles_msg')
@@ -21,98 +23,66 @@ const HeadMovementControl = () => {
                 'robot_toolkit_msgs/motion_tools_srv'
             );
 
-            const request = {
-                data: { command: "enable_all" }
-              };
+            const request = { data: { command: "enable_all" } };
 
             motionService.callService(request,
-                (result) => {
-                    console.log('Motion tools service initialized:', result);
-                },
-                (error) => {
-                    console.error('Error initializing motion tools service:', error);
-                }
+                (result) => console.log('Motion tools service ready:', result),
+                (error) => console.error('Error al activar motion tools:', error)
             );
         }
     }, [ros]);
 
-    const handleMoveHead = () => {
-        if (!anglePitch || !angleYaw) {
-            alert("Por favor ingrese ambos ángulos.");
-            return;
-        }
-
-        if (!headTopic) {
-            alert("No hay conexión con ROS.");
-            return;
-        }
+    const publishHead = (newPitch, newYaw) => {
+        if (!headTopic) return;
 
         const message = new ROSLIB.Message({
             names: ["HeadPitch", "HeadYaw"],
-            angles: [parseFloat(anglePitch), parseFloat(angleYaw)],
-            fraction_max_speed: [parseFloat(speed), parseFloat(speed)]
+            angles: [newPitch, newYaw],
+            fraction_max_speed: [speed, speed]
         });
 
         headTopic.publish(message);
-        console.log("Moviendo cabeza:", message);
+        console.log("Moviendo cabeza a:", message);
     };
+
+    const clamp = (value) => Math.max(-MAX, Math.min(MAX, value));
+
+    const handleKey = (e) => {
+        let newPitch = pitch;
+        let newYaw = yaw;
+
+        switch (e.key.toLowerCase()) {
+            case 'i': // arriba
+                newPitch = clamp(pitch - STEP);
+                break;
+            case 'k': // abajo
+                newPitch = clamp(pitch + STEP);
+                break;
+            case 'j': // izquierda
+                newYaw = clamp(yaw + STEP);
+                break;
+            case 'l': // derecha
+                newYaw = clamp(yaw - STEP);
+                break;
+            default:
+                return;
+        }
+
+        setPitch(newPitch);
+        setYaw(newYaw);
+        publishHead(newPitch, newYaw);
+    };
+
+    useEffect(() => {
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [pitch, yaw]);
 
     return (
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <h2>Control de cabeza del robot</h2>
-
-            <div>
-                <label>Ángulo pitch:</label>
-                <input
-                    type="number"
-                    value={anglePitch}
-                    onChange={(e) => setAnglePitch(e.target.value)}
-                    placeholder="Ej: 0.3"
-                    step="0.01"
-                    style={{ margin: '5px' }}
-                />
-            </div>
-
-            <div>
-                <label>Ángulo yaw:</label>
-                <input
-                    type="number"
-                    value={angleYaw}
-                    onChange={(e) => setAngleYaw(e.target.value)}
-                    placeholder="Ej: 0.2"
-                    step="0.01"
-                    style={{ margin: '5px' }}
-                />
-            </div>
-
-            <div>
-                <label>Velocidad (0.0 a 1.0):</label>
-                <input
-                    type="number"
-                    value={speed}
-                    onChange={(e) => setSpeed(e.target.value)}
-                    placeholder="Ej: 0.1"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    style={{ margin: '5px' }}
-                />
-            </div>
-
-            <button
-                onClick={handleMoveHead}
-                style={{
-                    marginTop: '10px',
-                    padding: '10px 20px',
-                    backgroundColor: '#007BFF',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer'
-                }}
-            >
-                Mover cabeza
-            </button>
+            <h2>🎮 Mover Cabeza con Teclado</h2>
+            <p><strong>I</strong> = arriba | <strong>K</strong> = abajo | <strong>J</strong> = izquierda | <strong>L</strong> = derecha</p>
+            <p>Pitch: {pitch.toFixed(2)} rad | Yaw: {yaw.toFixed(2)} rad</p>
         </div>
     );
 };
