@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRos } from '../contexts/RosContext';
-import { createTopic } from '../services/RosManager';
+import { createTopic, createService } from '../services/RosManager';
 import * as ROSLIB from 'roslib';
 
 const HeadMovementControl = () => {
@@ -12,6 +12,29 @@ const HeadMovementControl = () => {
     const headTopic = ros
         ? createTopic(ros, '/set_angles', 'robot_toolkit_msgs/set_angles_msg')
         : null;
+
+    useEffect(() => {
+        if (ros) {
+            const motionService = createService(
+                ros,
+                '/robot_toolkit/motion_tools_srv',
+                'robot_toolkit_msgs/motion_tools_srv'
+            );
+
+            const request = new ROSLIB.ServiceRequest({
+                command: 'enable_all'
+            });
+
+            motionService.callService(request,
+                (result) => {
+                    console.log('✅ Motion tools service initialized:', result);
+                },
+                (error) => {
+                    console.error('❌ Error initializing motion tools service:', error);
+                }
+            );
+        }
+    }, [ros]);
 
     const handleMoveHead = () => {
         if (!anglePitch || !angleYaw) {
