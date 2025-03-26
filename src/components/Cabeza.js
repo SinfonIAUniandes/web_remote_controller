@@ -27,10 +27,10 @@ const HeadMovementControl = () => {
 
             motionService.callService(request,
                 (result) => {
-                    console.log('✅ Motion tools service initialized:', result);
+                    console.log('Motion tools service initialized:', result);
                 },
                 (error) => {
-                    console.error('❌ Error initializing motion tools service:', error);
+                    console.error('Error initializing motion tools service:', error);
                 }
             );
         }
@@ -59,10 +59,10 @@ const HeadMovementControl = () => {
 
     return (
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <h2>🧠 Control de Cabeza del Robot</h2>
+            <h2>Control de cabeza del robot</h2>
 
             <div>
-                <label>Ángulo Pitch:</label>
+                <label>Ángulo pitch:</label>
                 <input
                     type="number"
                     value={anglePitch}
@@ -74,7 +74,7 @@ const HeadMovementControl = () => {
             </div>
 
             <div>
-                <label>Ángulo Yaw:</label>
+                <label>Ángulo yaw:</label>
                 <input
                     type="number"
                     value={angleYaw}
@@ -111,7 +111,7 @@ const HeadMovementControl = () => {
                     cursor: 'pointer'
                 }}
             >
-                Mover Cabeza
+                Mover cabeza
             </button>
         </div>
     );
