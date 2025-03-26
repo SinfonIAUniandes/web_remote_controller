@@ -8,11 +8,12 @@ import Imagen from './components/Imagen';
 import Battery from './components/Battery';
 import Volumen from './components/Volumen';
 import Texto from './components/Texto';
-
+import Animaciones from './components/Animaciones';
+import Audio from './components/Audio';
 import BreathingControl from './components/BreathingControl';
 import AutonomousLifeControl from './components/AutonomousLifeControl';
-import TrackerControl from  './components/TrackerControl';
-import ShowWordsTablet from  './components/ShowWordsTablet';
+import TrackerControl from './components/TrackerControl';
+import ShowWordsTablet from './components/ShowWordsTablet';
 
 const App = () => {
     return (
@@ -28,17 +29,24 @@ const App = () => {
             <Leds />
             <h1>Estado de la Batería</h1>
             <Battery />
+            <h1>Texto</h1>
+            <Texto />
             <h1>Volumen</h1>
             <Volumen />
             <h1>Control de Respiración</h1>
             <BreathingControl />
             <h1>Modo Autónomo</h1>
             <AutonomousLifeControl />
-            <h1>Control del Tracker</h1 >
+            <h1>Control del Tracker</h1>
             <TrackerControl />
-            <h1>Ver en tablet qué dice el robot</h1 >
+            <h1>Ver en tablet qué dice el robot</h1>
             <ShowWordsTablet />
+            <h1>Animaciones</h1>
+            <Animaciones />
+            <h1>Audio</h1>
+            <Audio />
         </div>
     );
 };
+
 export default App;
