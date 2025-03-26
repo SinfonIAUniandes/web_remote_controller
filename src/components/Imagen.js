@@ -43,7 +43,7 @@ const ServicioImagen = () => {
         }
 
         // Usamos show_web_view para enviar imágenes cargadas desde archivos
-        const showImageService = createService(ros, '/pytoolkit/ALTabletService/show_web_view', 'robot_toolkit_msgs/tablet_service_srv');
+        const showImageService = createService(ros, '/pytoolkit/ALTabletService/show_image_srv', 'robot_toolkit_msgs/tablet_service_srv');
 
         const request = { url: imageData };
 
@@ -61,7 +61,7 @@ const ServicioImagen = () => {
         }
 
         // Usamos show_image para enviar imágenes desde URLs
-        const showImageService = createService(ros, '/pytoolkit/ALTabletService/show_image', 'robot_toolkit_msgs/tablet_service_srv');
+        const showImageService = createService(ros, '/pytoolkit/ALTabletService/show_image_srv', 'robot_toolkit_msgs/tablet_service_srv');
 
         const request = { url };
 
