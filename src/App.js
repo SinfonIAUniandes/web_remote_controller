@@ -1,5 +1,6 @@
 // src/App.js
 import React from 'react';
+
 import Cameras from './components/Cameras';
 import Leds from './components/Leds';
 import Base from './components/Base';
@@ -17,6 +18,7 @@ import TrackerControl from './components/TrackerControl';
 import ShowWordsTablet from './components/ShowWordsTablet';
 import HideTabletScreen from './components/HideTabletScreen';
 import Cabeza from './components/Cabeza';
+import ScriptPanel from './components/ScriptPanel'
 
 const App = () => {
     return (
@@ -51,10 +53,13 @@ const App = () => {
             <Animaciones />
             <h1>Audio</h1>
             <Audio />
-            <h1>Ocultar pantalla de la tablet</h1>
-            <Cabeza />
             <h1>Cabeza</h1>
+            <Cabeza />
+            <h1>Ocultar pantalla de la tablet</h1>
             <HideTabletScreen />
+
+            <h1>Panel de script</h1>
+            <ScriptPanel />
         </div>
     );
 };
