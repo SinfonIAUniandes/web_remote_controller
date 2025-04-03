@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useRos } from '../contexts/RosContext';
-import { createTopic, createService } from '../services/RosManager';
+import { createTopic } from '../services/RosManager';
 import * as ROSLIB from 'roslib';
 
 function parseContent(text) {
@@ -41,9 +41,11 @@ const ScriptPanel = () => {
     const [file, setFile] = useState({'name': ''});
     const [state, setState] = useState([]);
     const [selectedAction, setSelectedAction] = useState(0);
+    const [logMessages, setLogMessages] = useState([]);
     
     const { ros } = useRos();
     const speechTopic = createTopic(ros, '/speech', 'robot_toolkit_msgs/speech_msg');
+    const animationTopic = createTopic(ros, "/animations", "robot_toolkit_msgs/animation_msg");
 
     function handleOnChange(event) {
         if(event.target.files.length > 1)
@@ -58,10 +60,12 @@ const ScriptPanel = () => {
             const result = event.target.result;
             const parsedFile = parseContent(result);
             setState(parsedFile);
+            setLogMessages([...logMessages, "Archivo cargado!"])
         }
 
         reader.onerror = (error) => {
             console.error("Error al leer el archivo: ", error);
+            setLogMessages([...logMessages, "Error al cargar el archivo!"])
         }
 
         reader.readAsText(file);
@@ -85,18 +89,31 @@ const ScriptPanel = () => {
         if(!ros) return;
         const action = state.actions[selectedAction];
 
-        if(action.text !== null){
+        if(action.text !== null) {
+            const animate = action.action === null ? true : false;
             const message = new ROSLIB.Message({
                 language: state.config.language,
                 text: action.text,
-                animated: true
+                animated: animate
             });
-            console.log("sending message topic")
-            speechTopic.publish(message)
+            if(speechTopic) {
+                setLogMessages([...logMessages, "Publicando el mensaje en el topico"]);
+                speechTopic.publish(message);
+            } else {
+                console.error("El publicador de speech no está disponible.");
+            }
         }
 
         if(action.action !== null) {
-            console.log("the action can be send")
+            const message = new ROSLIB.Message({
+                family: "animations",
+                animation_name: action.action
+            });
+            if (animationTopic) {
+                animationTopic.publish(message);
+            } else {
+                console.error("El publicador de animaciones no está disponible.");
+            }
         }
     }
 
@@ -118,12 +135,15 @@ const ScriptPanel = () => {
 
             <div className="button-group">
                 <button id="before" onClick={ handleClicSelectAction }> &lt; &lt; </button>
-                <button onClick={handleExecuteAction}>Iniciar</button>
+                <button onClick={ handleExecuteAction }>Iniciar</button>
                 <button id="after" onClick={ handleClicSelectAction }> &gt; &gt; </button>
             </div>
 
-            <div className="console">
             <h2>Console</h2>
+            <div className="console" style={{height: "150px", overflowY: "scroll", border: "solid 1px #000"}}>
+                {logMessages.map((item, i) => {
+                    return <p key={i}>{item}</p>
+                })}
             </div>
         </div>
     );
