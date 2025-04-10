@@ -19,6 +19,7 @@ import ShowWordsTablet from './components/ShowWordsTablet';
 import HideTabletScreen from './components/HideTabletScreen';
 import Cabeza from './components/Cabeza';
 import ScriptPanel from './components/ScriptPanel'
+import PostureControl from './components/PostureControl'
 
 const App = () => {
     return (
@@ -57,9 +58,10 @@ const App = () => {
             <Cabeza />
             <h1>Ocultar pantalla de la tablet</h1>
             <HideTabletScreen />
-
             <h1>Panel de script</h1>
             <ScriptPanel />
+            <h1>Postura control</h1>
+            <PostureControl />
         </div>
     );
 };
