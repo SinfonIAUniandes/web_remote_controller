@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useRos } from "../contexts/RosContext";
-import { createTopic } from "../services/RosManager";
-import * as ROSLIB from "roslib";
+import { useRos } from "../../../contexts/RosContext";
+import { createService, callService } from "../../../services/RosManager";
 
 // Ruta al archivo txt
 import animationsTxt from "../animations/animations.txt";
@@ -12,8 +11,6 @@ const RobotAnimationControl = () => {
     const [selectedSubcategory, setSelectedSubcategory] = useState("");
     const [selectedAnimation, setSelectedAnimation] = useState("");
     const [animations, setAnimations] = useState({});
-
-    const animationTopic = createTopic(ros, "/animations", "robot_toolkit_msgs/animation_msg");
 
     useEffect(() => {
         fetch(animationsTxt)
@@ -55,14 +52,17 @@ const RobotAnimationControl = () => {
 
         console.log(`🎬 Enviando animación: ${fullAnimationPath}`);
 
-        const message = new ROSLIB.Message({ family: "animations", animation_name: fullAnimationPath });
+        // Llamar al servicio /play_animation
+        const animationService = createService(ros, "/naoqi_manipulation/play_animation", "naoqi_utilities_msgs/srv/PlayAnimation");
+        const request = { animation_name: fullAnimationPath };
 
-        if (animationTopic) {
-            animationTopic.publish(message);
-            console.log(`Animación enviada: ${fullAnimationPath}`);
-        } else {
-            console.error("El publicador de animaciones no está disponible.");
-        }
+        callService(animationService, request, (result) => {
+            if (result.success) {
+                console.log(`Animación ejecutada exitosamente: ${result.message}`);
+            } else {
+                console.error(`Error al ejecutar la animación: ${result.message}`);
+            }
+        });
     };
 
     return (

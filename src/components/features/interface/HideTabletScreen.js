@@ -1,6 +1,6 @@
 import React from 'react';
-import { useRos } from '../contexts/RosContext';
-import { createTopic, createService } from '../services/RosManager';
+import { useRos } from '../../../contexts/RosContext';
+import { createTopic, createService } from '../../../services/RosManager';
 import * as ROSLIB from 'roslib';
 
 //Componente para esconder lo que se ve en la tablet del robot

@@ -1,7 +1,7 @@
 // src/components/Servicio.js
 import React, { useState } from 'react';
-import { useRos } from '../contexts/RosContext';
-import { createService } from '../services/RosManager';
+import { useRos } from '../../../contexts/RosContext';
+import { createService } from '../../../services/RosManager';
 
 const Servicio = () => {
     const { ros } = useRos(); // Obtener la instancia de ROS del contexto

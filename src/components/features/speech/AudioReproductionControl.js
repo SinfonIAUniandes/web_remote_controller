@@ -1,9 +1,8 @@
 //audio que sirve: http://audio-edge-es6pf.mia.g.radiomast.io/ref-128k-mp3-stereo
 
 import React, { useState } from 'react';
-import { useRos } from '../contexts/RosContext';
-import { createService } from '../services/RosManager';
-import * as ROSLIB from 'roslib';
+import { useRos } from '../../../contexts/RosContext';
+import { createService, callService } from '../../../services/RosManager';
 
 const RobotAudioControl = () => {
     const { ros } = useRos();
@@ -11,11 +10,11 @@ const RobotAudioControl = () => {
 
     // Servicios de ROS para reproducir y detener audio
     const audioService = ros 
-        ? createService(ros, '/pytoolkit/ALAudioPlayer/play_audio_stream_srv','/robot_toolkit_msgs/set_stiffnesses_sev')
+        ? createService(ros, '/naoqi_speech/play_web_stream', 'naoqi_utilities_msgs/srv/PlayWebStream')
         : null;
 
     const stopAudioService = ros 
-        ? createService(ros, '/pytoolkit/ALAudioPlayer/stop_audio_stream_srv', 'std_srvs/Empty') // SIN PARÁMETROS
+        ? createService(ros, '/naoqi_speech/stop_all_sounds', 'std_srvs/srv/Trigger')
         : null;
 
     // Enviar URL de audio al robot
@@ -30,32 +29,33 @@ const RobotAudioControl = () => {
             return;
         }
 
-        // Crear mensaje ROS con la URL del audio
-        const request = new ROSLIB.ServiceRequest({
-            names: audioUrl,  
-            stiffnesses: 1.0 
-        });
+        // Crear solicitud con la URL del audio
+        const request = { url: audioUrl };
 
-        // Enviar mensaje ROS al servicio
-        audioService.callService(request, (result) => {
-            console.log('Reproduciendo audio en el robot desde URL:', result);
-        }, (error) => {
-            console.error('Error al reproducir el audio desde URL:', error);
+        // Llamar al servicio para reproducir el audio
+        callService(audioService, request, (result) => {
+            if (result.success) {
+                console.log(`Reproduciendo audio desde URL: ${audioUrl}. Mensaje: ${result.message}`);
+            } else {
+                console.error(`Error al reproducir el audio: ${result.message}`);
+            }
         });
     };
 
-    // Detener audio en el robot (SIN PARÁMETROS)
+    // Detener audio en el robot
     const handleStopAudio = () => {
         if (!stopAudioService) {
             alert("Error: No hay conexión con ROS.");
             return;
         }
 
-        const stopRequest = new ROSLIB.ServiceRequest({});
-        stopAudioService.callService(stopRequest, (result) => {
-            console.log('Deteniendo audio en el robot:', result);
-        }, (error) => {
-            console.error('Error al detener el audio:', error);
+        // Llamar al servicio para detener el audio
+        callService(stopAudioService, {}, (result) => {
+            if (result.success) {
+                console.log("Audio detenido exitosamente.");
+            } else {
+                console.error(`Error al detener el audio: ${result.message}`);
+            }
         });
     };
 

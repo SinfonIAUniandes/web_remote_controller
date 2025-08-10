@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useRos } from '../contexts/RosContext';
+import { useRos } from '../../../contexts/RosContext';
 import * as ROSLIB from 'roslib';
 
 const ShowWordsTablet = () => {

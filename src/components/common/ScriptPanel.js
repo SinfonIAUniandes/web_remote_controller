@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { useRos } from '../contexts/RosContext';
-import { createTopic } from '../services/RosManager';
+import { useRos } from '../../contexts/RosContext';
+import { createTopic } from '../../services/RosManager';
 import * as ROSLIB from 'roslib';
 
 function parseContent(text) {
