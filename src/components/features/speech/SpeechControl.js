@@ -20,7 +20,7 @@ const SpeechControl = () => {
 
         const speechService = createService(
             ros,
-            '/naoqi_speech/say',
+            '/naoqi_speech_node/say',
             'naoqi_utilities_msgs/srv/Say'
         );
 

@@ -18,7 +18,6 @@ const publishMessage = (topic, messageData) => {
 //Función para suscribirse a un tópico en ROS
 const subscribeToTopic = (topic, callback) => {
     topic.subscribe((message) => {
-        console.log('Received message on ' + topic.name + ': ', message);
         callback(message);
     });
 };

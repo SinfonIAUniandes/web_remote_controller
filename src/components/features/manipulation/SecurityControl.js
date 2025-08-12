@@ -12,7 +12,7 @@ const SecurityControl = () => {
             console.error("ROS connection not available.");
             return;
         }
-        const service = createService(ros, `/naoqi_manipulation${serviceName}`, serviceType);
+        const service = createService(ros, `/naoqi_manipulation_node${serviceName}`, serviceType);
         callService(service, requestData, (result) => {
             console.log(`Service call to ${serviceName} successful:`, result);
         });

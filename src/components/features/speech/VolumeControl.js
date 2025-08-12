@@ -9,7 +9,7 @@ const VolumeControl = () => {
     useEffect(() => {
         if (ros) {
             // Crear el servicio para obtener el volumen actual
-            const getVolumeService = createService(ros, '/naoqi_speech/get_volume', 'naoqi_utilities_msgs/srv/GetVolume');
+            const getVolumeService = createService(ros, '/naoqi_speech_node/get_volume', 'naoqi_utilities_msgs/srv/GetVolume');
 
             // Llamar al servicio para obtener el volumen inicial
             callService(getVolumeService, {}, (result) => {
@@ -29,7 +29,7 @@ const VolumeControl = () => {
 
         if (ros) {
             // Crear el servicio para establecer el volumen
-            const setVolumeService = createService(ros, '/naoqi_speech/set_volume', 'naoqi_utilities_msgs/srv/SetVolume');
+            const setVolumeService = createService(ros, '/naoqi_speech_node/set_volume', 'naoqi_utilities_msgs/srv/SetVolume');
             const request = { volume: newVolume };
 
             // Llamar al servicio para actualizar el volumen

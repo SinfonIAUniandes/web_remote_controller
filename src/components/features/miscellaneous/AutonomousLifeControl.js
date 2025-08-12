@@ -16,7 +16,7 @@ const AutonomousLifeControl = () => {
         // Crear el servicio con el nombre y tipo correctos
         const service = createService(
             ros,
-            '/naoqi_miscellaneous/set_autonomous_state',
+            '/naoqi_miscellaneous_node/set_autonomous_state',
             'std_srvs/srv/SetBool'
         );
 

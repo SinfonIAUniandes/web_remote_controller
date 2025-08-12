@@ -18,7 +18,7 @@ const BreathingControl = () => {
         // 1. Usar el nuevo nombre y tipo de servicio de ROS 2
         const service = createService(
             ros,
-            '/naoqi_manipulation/toggle_breathing',
+            '/naoqi_manipulation_node/toggle_breathing',
             'naoqi_utilities_msgs/srv/SetBreathing'
         );
 

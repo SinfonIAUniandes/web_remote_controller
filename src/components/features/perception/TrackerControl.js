@@ -15,7 +15,7 @@ const TrackerControl = () => {
         // 1. Usar el nuevo nombre y tipo de servicio
         const service = createService(
             ros,
-            '/naoqi_perception/set_tracker_mode',
+            '/naoqi_perception_node/set_tracker_mode',
             'naoqi_utilities_msgs/srv/SetTrackerMode'
         );
 

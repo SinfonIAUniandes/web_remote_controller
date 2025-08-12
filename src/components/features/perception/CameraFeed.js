@@ -13,46 +13,49 @@ const CameraFeed = () => {
             return;
         }
 
-        // 1. Crear tópicos con los nuevos nombres de naoqi_driver2
-        const frontCameraTopic = createTopic(ros, 'naoqi_driver/camera/front/image_raw/compressed', 'sensor_msgs/msg/CompressedImage');
-        const bottomCameraTopic = createTopic(ros, 'naoqi_driver/camera/bottom/image_raw/compressed', 'sensor_msgs/msg/CompressedImage');
+        // Crear tópicos para consumir y mostrar imágenes
+        const frontCameraRawTopic = createTopic(ros, '/camera/front/image_raw', 'sensor_msgs/msg/Image');
+        const frontCameraCompressedTopic = createTopic(ros, '/camera/front/image_raw/compressed', 'sensor_msgs/msg/CompressedImage');
+        const bottomCameraRawTopic = createTopic(ros, '/camera/bottom/image_raw', 'sensor_msgs/msg/Image');
+        const bottomCameraCompressedTopic = createTopic(ros, '/camera/bottom/image_raw/compressed', 'sensor_msgs/msg/CompressedImage');
 
-        // 2. Suscribirse a la cámara frontal y actualizar la imagen
-        const frontSub = subscribeToTopic(frontCameraTopic, (message) => {
+        // Suscribirse a los tópicos comprimidos para mostrar las imágenes
+        const frontCompressedSub = subscribeToTopic(frontCameraCompressedTopic, (message) => {
             if (frontCameraRef.current) {
                 frontCameraRef.current.src = "data:image/jpeg;base64," + message.data;
             }
         });
 
-        // 3. Suscribirse a la cámara inferior y actualizar la imagen
-        const bottomSub = subscribeToTopic(bottomCameraTopic, (message) => {
+        const bottomCompressedSub = subscribeToTopic(bottomCameraCompressedTopic, (message) => {
             if (bottomCameraRef.current) {
                 bottomCameraRef.current.src = "data:image/jpeg;base64," + message.data;
             }
         });
 
-        // 4. La llamada al servicio para habilitar las cámaras ya no es necesaria.
+        // Suscribirse a los tópicos sin comprimir para consumirlos (sin mostrar)
+        const frontRawSub = subscribeToTopic(frontCameraRawTopic, () => {});
+
+        const bottomRawSub = subscribeToTopic(bottomCameraRawTopic, () => {});
 
         // Limpiar las suscripciones al desmontar el componente
         return () => {
-            frontCameraTopic.unsubscribe();
-            bottomCameraTopic.unsubscribe();
+            frontCameraRawTopic.unsubscribe();
+            frontCameraCompressedTopic.unsubscribe();
+            bottomCameraRawTopic.unsubscribe();
+            bottomCameraCompressedTopic.unsubscribe();
             console.log('Suscripciones a tópicos de cámara canceladas.');
         };
-        
     }, [ros]);
 
     return (
         <div>
             <h3>Cámaras del Robot</h3>
-            <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '10px' }}>
                 <div>
                     <h4>Cámara Frontal</h4>
                     <img 
                         id="front_camera" 
                         ref={frontCameraRef} 
                         alt="Cámara Frontal" 
-                        style={{ width: '320px', height: '240px', border: '1px solid black' }} 
                     />
                 </div>
                 <div>
@@ -61,10 +64,8 @@ const CameraFeed = () => {
                         id="bottom_camera" 
                         ref={bottomCameraRef} 
                         alt="Cámara Inferior" 
-                        style={{ width: '320px', height: '240px', border: '1px solid black' }}
                     />
                 </div>
-            </div>
         </div>
     );
 };

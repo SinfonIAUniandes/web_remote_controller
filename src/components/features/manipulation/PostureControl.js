@@ -3,7 +3,7 @@ import { useRos } from '../../../contexts/RosContext';
 import { createService, callService } from '../../../services/RosManager';
 
 const RobotPostureControl = () => {
-    const { ros } = useRos();
+    const { ros, setPosture } = useRos();
 
     const handlePosture = (posture) => {
         if (!ros) {
@@ -14,7 +14,7 @@ const RobotPostureControl = () => {
         // 1. Crear el servicio con el nombre y tipo correctos de ROS 2
         const postureService = createService(
             ros, 
-            '/naoqi_manipulation/go_to_posture', 
+            '/naoqi_manipulation_node/go_to_posture', 
             'naoqi_utilities_msgs/srv/GoToPosture'
         );
 
@@ -24,6 +24,7 @@ const RobotPostureControl = () => {
         };
 
         console.log(`Enviando solicitud de postura: ${posture}`);
+        setPosture(posture); // Actualizar el estado global de la postura
 
         // 3. Llamar al servicio usando el helper de RosManager
         callService(postureService, request, (result) => {
@@ -42,10 +43,10 @@ const RobotPostureControl = () => {
                 <button onClick={() => handlePosture('rest')}>
                     Agacharse (Rest)
                 </button>
-                <button onClick={() => handlePosture('Stand')} style={{ marginLeft: '10px' }}>
+                <button onClick={() => handlePosture('stand')} style={{ marginLeft: '10px' }}>
                     Pararse (Stand)
                 </button>
-                 <button onClick={() => handlePosture('Sit')} style={{ marginLeft: '10px' }}>
+                 <button onClick={() => handlePosture('sit')} style={{ marginLeft: '10px' }}>
                     Sentarse (Sit)
                 </button>
             </div>

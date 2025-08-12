@@ -10,11 +10,11 @@ const RobotAudioControl = () => {
 
     // Servicios de ROS para reproducir y detener audio
     const audioService = ros 
-        ? createService(ros, '/naoqi_speech/play_web_stream', 'naoqi_utilities_msgs/srv/PlayWebStream')
+        ? createService(ros, '/naoqi_speech_node/play_web_stream', 'naoqi_utilities_msgs/srv/PlayWebStream')
         : null;
 
     const stopAudioService = ros 
-        ? createService(ros, '/naoqi_speech/stop_all_sounds', 'std_srvs/srv/Trigger')
+        ? createService(ros, '/naoqi_speech_node/stop_all_sounds', 'std_srvs/srv/Trigger')
         : null;
 
     // Enviar URL de audio al robot

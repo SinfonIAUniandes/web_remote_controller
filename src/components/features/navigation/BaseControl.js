@@ -56,15 +56,36 @@ const BaseControl = () => {
         console.log(`Mensaje publicado:`, message);
     };
 
+    const handleKeyUp = (event) => {
+        const bannedHTMLElements = ["input", "textarea"];
+        if (bannedHTMLElements.includes(event.target.localName)) return;
+
+        // Crear el tópico para publicar comandos de velocidad
+        const cmdVelTopic = createTopic(ros, '/cmd_vel', 'geometry_msgs/msg/Twist');
+
+        // Mensaje con valores en cero para detener el robot
+        const stopMessage = {
+            linear: { x: 0, y: 0, z: 0 },
+            angular: { x: 0, y: 0, z: 0 }
+        };
+
+        // Publicar el mensaje en el tópico /cmd_vel
+        publishMessage(cmdVelTopic, stopMessage);
+        console.log(`Mensaje de parada publicado:`, stopMessage);
+    };
+
     const cachedHandleKeyPress = useCallback(handleKeyPress, [ros]);
+    const cachedHandleKeyUp = useCallback(handleKeyUp, [ros]);
 
     useEffect(() => {
         window.addEventListener("keydown", cachedHandleKeyPress, false);
+        window.addEventListener("keyup", cachedHandleKeyUp, false);
 
         return () => {
             window.removeEventListener("keydown", cachedHandleKeyPress, false);
+            window.removeEventListener("keyup", cachedHandleKeyUp, false);
         };
-    }, [cachedHandleKeyPress]);
+    }, [cachedHandleKeyPress, cachedHandleKeyUp]);
 
     return (<></>);
 };

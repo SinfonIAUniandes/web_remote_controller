@@ -47,7 +47,7 @@ const Dashboard = () => {
                 <div style={cardStyle}><BreathingControl /></div>
                 <div style={cardStyle}><AutonomousLifeControl /></div>
                 <div style={cardStyle}><SecurityControl /></div>
-                <div style={cardStyle}><ScriptPanel /></div>
+                {/* <div style={cardStyle}><ScriptPanel /></div> */}
             </div>
         </div>
     );

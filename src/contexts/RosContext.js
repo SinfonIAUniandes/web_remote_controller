@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as ROSLIB from 'roslib';
+import { createService, callService } from '../services/RosManager';
 
 //Contexto en React para manejar la conexión a ROS
 
@@ -10,6 +11,8 @@ const RosContext = createContext();
 export const RosProvider = ({ children }) => {
     const [ros, setRos] = useState(null);
     const [rosUrl, setRosUrl] = useState('ws://localhost:9090');  // Default to localhost
+    const [robotModel, setRobotModel] = useState(null); // Estado para el modelo del robot
+    const [posture, setPosture] = useState('Unknown'); // Estado para la postura del robot
 
     useEffect(() => {
         const userIp = prompt("Please enter the server IP address (default is localhost):", "localhost");
@@ -40,8 +43,25 @@ export const RosProvider = ({ children }) => {
         connect(rosUrl);
     }, [rosUrl]);
 
+    useEffect(() => {
+        if (ros) {
+            const robotConfigService = createService(ros, '/naoqi_driver/get_robot_config', 'naoqi_bridge_msgs/srv/GetRobotInfo');
+            
+            callService(robotConfigService, {}, (result) => {
+                if (result.info && result.info.model) {
+                    console.log(`Robot model detected: ${result.info.model}`);
+                    if (result.info.model.toLowerCase().includes('nao')) {
+                        setRobotModel('NAO');
+                    } else {
+                        setRobotModel('Pepper');
+                    }
+                }
+            });
+        }
+    }, [ros]);
+
     return (
-        <RosContext.Provider value={{ ros }}>
+        <RosContext.Provider value={{ ros, robotModel, posture, setPosture }}>
             {children}
         </RosContext.Provider>
     );
