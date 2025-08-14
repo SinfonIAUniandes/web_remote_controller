@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRos } from '../../contexts/RosContext';
 
 // Importación de todos los componentes de funcionalidades
 import AnimationControl from '../features/manipulation/AnimationControl';
@@ -33,6 +34,8 @@ const cardStyle = {
 };
 
 const Dashboard = () => {
+    const { robotModel } = useRos();
+
     return (
         <div>
             <BaseControl /> {/* Componente sin UI visible, solo para eventos de teclado */}
@@ -51,7 +54,9 @@ const Dashboard = () => {
                 <div style={cardStyle}><SecurityControl /></div>
                 {/* <div style={cardStyle}><ScriptPanel /></div> */}
                 <div style={cardStyle}><HeadControl /></div>
-                <div style={cardStyle}><TabletDisplay /></div> 
+                {robotModel === 'Pepper' && (
+                    <div style={cardStyle}><TabletDisplay /></div>
+                )}
             </div>
         </div>
     );
