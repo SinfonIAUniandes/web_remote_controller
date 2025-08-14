@@ -1,32 +1,41 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { useRos } from '../../../contexts/RosContext';
 import { createTopic, publishMessage } from '../../../services/RosManager';
 
 const BaseControl = () => {
     const { ros } = useRos();
-    const SPEED = 0.5;
+    const [speed, setSpeed] = useState(0.3); // Estado para la velocidad ajustable
+    const pressedKeys = useRef(new Set());
+    const cmdVelTopic = useRef(null);
 
     useEffect(() => {
         if (!ros) {
             console.error("La conexión con ROS no está disponible.");
             return;
         }
+        // Crear el tópico una sola vez
+        cmdVelTopic.current = createTopic(ros, '/cmd_vel', 'geometry_msgs/msg/Twist');
+
+        // Función de limpieza para detener el robot si el componente se desmonta
+        return () => {
+            if (cmdVelTopic.current) {
+                const stopMessage = {
+                    linear: { x: 0, y: 0, z: 0 },
+                    angular: { x: 0, y: 0, z: 0 }
+                };
+                publishMessage(cmdVelTopic.current, stopMessage);
+            }
+        };
     }, [ros]);
 
-    const handleKeyPress = (event) => {
-        const bannedHTMLElements = ["input", "textarea"];
-        if (bannedHTMLElements.includes(event.target.localName)) return;
+    const updateMovement = useCallback(() => {
+        if (!cmdVelTopic.current) return;
 
-        // Crear el tópico para publicar comandos de velocidad
-        const cmdVelTopic = createTopic(ros, '/cmd_vel', 'geometry_msgs/msg/Twist');
-
-        // Mensaje inicial con valores por defecto
-        let message = {
+        const message = {
             linear: { x: 0, y: 0, z: 0 },
             angular: { x: 0, y: 0, z: 0 }
         };
 
-        const pressedKey = event.keyCode;
         const keys = {
             A: 65, // Izquierda
             D: 68, // Derecha
@@ -36,58 +45,59 @@ const BaseControl = () => {
             Q: 81  // Rotar izquierda
         };
 
-        // Actualizar el mensaje según la tecla presionada
-        if (pressedKey === keys.A) {
-            message.linear.y = SPEED;
-        } else if (pressedKey === keys.D) {
-            message.linear.y = -SPEED;
-        } else if (pressedKey === keys.W) {
-            message.linear.x = SPEED;
-        } else if (pressedKey === keys.S) {
-            message.linear.x = -SPEED;
-        } else if (pressedKey === keys.E) {
-            message.angular.z = -SPEED;
-        } else if (pressedKey === keys.Q) {
-            message.angular.z = SPEED;
-        }
+        if (pressedKeys.current.has(keys.W)) message.linear.x = speed;
+        if (pressedKeys.current.has(keys.S)) message.linear.x = -speed;
+        if (pressedKeys.current.has(keys.A)) message.linear.y = speed;
+        if (pressedKeys.current.has(keys.D)) message.linear.y = -speed;
+        if (pressedKeys.current.has(keys.Q)) message.angular.z = speed;
+        if (pressedKeys.current.has(keys.E)) message.angular.z = -speed;
 
-        // Publicar el mensaje en el tópico /cmd_vel
-        publishMessage(cmdVelTopic, message);
+        publishMessage(cmdVelTopic.current, message);
         console.log(`Mensaje publicado:`, message);
-    };
 
-    const handleKeyUp = (event) => {
+    }, [speed]);
+
+    const handleKeyDown = useCallback((event) => {
+        const bannedHTMLElements = ["input", "textarea"];
+        if (bannedHTMLElements.includes(event.target.localName) || event.repeat) return;
+
+        pressedKeys.current.add(event.keyCode);
+        updateMovement();
+    }, [updateMovement]);
+
+    const handleKeyUp = useCallback((event) => {
         const bannedHTMLElements = ["input", "textarea"];
         if (bannedHTMLElements.includes(event.target.localName)) return;
 
-        // Crear el tópico para publicar comandos de velocidad
-        const cmdVelTopic = createTopic(ros, '/cmd_vel', 'geometry_msgs/msg/Twist');
-
-        // Mensaje con valores en cero para detener el robot
-        const stopMessage = {
-            linear: { x: 0, y: 0, z: 0 },
-            angular: { x: 0, y: 0, z: 0 }
-        };
-
-        // Publicar el mensaje en el tópico /cmd_vel
-        publishMessage(cmdVelTopic, stopMessage);
-        console.log(`Mensaje de parada publicado:`, stopMessage);
-    };
-
-    const cachedHandleKeyPress = useCallback(handleKeyPress, [ros]);
-    const cachedHandleKeyUp = useCallback(handleKeyUp, [ros]);
+        pressedKeys.current.delete(event.keyCode);
+        updateMovement();
+    }, [updateMovement]);
 
     useEffect(() => {
-        window.addEventListener("keydown", cachedHandleKeyPress, false);
-        window.addEventListener("keyup", cachedHandleKeyUp, false);
+        window.addEventListener("keydown", handleKeyDown, false);
+        window.addEventListener("keyup", handleKeyUp, false);
 
         return () => {
-            window.removeEventListener("keydown", cachedHandleKeyPress, false);
-            window.removeEventListener("keyup", cachedHandleKeyUp, false);
+            window.removeEventListener("keydown", handleKeyDown, false);
+            window.removeEventListener("keyup", handleKeyUp, false);
         };
-    }, [cachedHandleKeyPress, cachedHandleKeyUp]);
+    }, [handleKeyDown, handleKeyUp]);
 
-    return (<></>);
+    return (
+        <div style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '20px' }}>
+            <label htmlFor="speed-slider">Velocidad: {speed.toFixed(2)}</label>
+            <input
+                id="speed-slider"
+                type="range"
+                min="0"
+                max="0.5"
+                step="0.1"
+                value={speed}
+                onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                style={{ width: '100%' }}
+            />
+        </div>
+    );
 };
 
 export default BaseControl;

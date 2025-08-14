@@ -97,6 +97,9 @@ const RobotAnimationControl = () => {
             const capitalizedPosture = posture.charAt(0).toUpperCase() + posture.slice(1);
             animationPath = `${capitalizedPosture}/${animationPath}`;
         }
+        else {
+            animationPath = `Stand/${animationPath}`;
+        }
 
         console.log(`Enviando animación: ${animationPath}`);
 

@@ -14,6 +14,8 @@ import SecurityControl from '../features/manipulation/SecurityControl';
 import SpeechControl from '../features/speech/SpeechControl';
 import TrackerControl from '../features/perception/TrackerControl';
 import VolumeControl from '../features/speech/VolumeControl';
+import HeadControl from '../features/manipulation/HeadControl';
+import TabletDisplay from '../features/interface/TabletDisplay';
 import ScriptPanel from '../common/ScriptPanel';
 
 const dashboardStyle = {
@@ -48,6 +50,8 @@ const Dashboard = () => {
                 <div style={cardStyle}><AutonomousLifeControl /></div>
                 <div style={cardStyle}><SecurityControl /></div>
                 {/* <div style={cardStyle}><ScriptPanel /></div> */}
+                <div style={cardStyle}><HeadControl /></div>
+                <div style={cardStyle}><TabletDisplay /></div> 
             </div>
         </div>
     );
