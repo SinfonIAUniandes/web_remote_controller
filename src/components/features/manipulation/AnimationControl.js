@@ -120,73 +120,85 @@ const RobotAnimationControl = () => {
     const controlsDisabled = robotModel === 'NAO' && !isNaoReady;
 
     return (
-        <div style={{ textAlign: "center" }}>
-            <h2>Control de Animaciones del Robot ({robotModel || 'Detectando...'})</h2>
-            <p>Postura actual del robot: <strong>{posture}</strong></p>
+        <div className="text-center flex flex-col h-full">
+            <h2 className="text-lg font-semibold">Control de Animaciones ({robotModel || 'Detectando...'})</h2>
+            <p className="text-sm text-gray-600 mb-2">Postura actual: <strong>{posture}</strong></p>
             
             {controlsDisabled && (
-                <p style={{ color: 'red' }}>
+                <p className="text-red-500 text-xs italic mb-2">
                     El robot NAO debe estar en postura 'Stand' o 'Sit' para ejecutar animaciones.
                 </p>
             )}
 
-            {/* Selección de Categoría */}
-            <div>
-                <label>Categoría:</label>
-                <select
-                    value={selectedCategory}
-                    onChange={(e) => {
-                        setSelectedCategory(e.target.value);
-                        setSelectedSubcategory("");
-                        setSelectedAnimation("");
-                    }}
-                    disabled={controlsDisabled}
-                >
-                    <option value="">Seleccione una categoría</option>
-                    {Object.keys(animations).map(category => (
-                        <option key={category} value={category}>{category}</option>
-                    ))}
-                </select>
-            </div>
-
-            {/* Si la categoría tiene subcategorías, se muestra este select */}
-            {selectedCategory && animations[selectedCategory] && Object.keys(animations[selectedCategory]).some(k => k !== "_no_subcategory") && (
+            {/* Contenedor de Selectores */}
+            <div className="space-y-3 my-4">
+                {/* Selección de Categoría */}
                 <div>
-                    <label>Subcategoría:</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Categoría:</label>
                     <select
-                        value={selectedSubcategory}
+                        value={selectedCategory}
                         onChange={(e) => {
-                            setSelectedSubcategory(e.target.value);
+                            setSelectedCategory(e.target.value);
+                            setSelectedSubcategory("");
                             setSelectedAnimation("");
                         }}
                         disabled={controlsDisabled}
+                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                     >
-                        <option value="">Seleccione una subcategoría</option>
-                        {Object.keys(animations[selectedCategory] || {}).map(subcategory => (
-                            <option key={subcategory} value={subcategory}>{subcategory === "_no_subcategory" ? "Sin subcategoría" : subcategory}</option>
+                        <option value="">Seleccione una categoría</option>
+                        {Object.keys(animations).map(category => (
+                            <option key={category} value={category}>{category}</option>
                         ))}
                     </select>
                 </div>
-            )}
 
-            {/* Selección de Animación */}
-            {selectedCategory && (
-                <div>
-                    <label>Animación:</label>
-                    <select
-                        value={selectedAnimation}
-                        onChange={(e) => setSelectedAnimation(e.target.value)}
-                        disabled={controlsDisabled}
-                    >
-                        <option value="">Seleccione una animación</option>
-                        {(animations[selectedCategory]?.[selectedSubcategory] || animations[selectedCategory]?._no_subcategory || []).map(anim => (
-                            <option key={anim} value={anim}>{anim}</option>
-                        ))}
-                    </select>
-                </div>
-            )}
+                {/* Si la categoría tiene subcategorías, se muestra este select */}
+                {selectedCategory && animations[selectedCategory] && Object.keys(animations[selectedCategory]).some(k => k !== "_no_subcategory") && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Subcategoría:</label>
+                        <select
+                            value={selectedSubcategory}
+                            onChange={(e) => {
+                                setSelectedSubcategory(e.target.value);
+                                setSelectedAnimation("");
+                            }}
+                            disabled={controlsDisabled}
+                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                        >
+                            <option value="">Seleccione una subcategoría</option>
+                            {Object.keys(animations[selectedCategory] || {}).map(subcategory => (
+                                <option key={subcategory} value={subcategory}>{subcategory === "_no_subcategory" ? "Sin subcategoría" : subcategory}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
-            <button onClick={handleAnimation} disabled={!selectedAnimation || controlsDisabled}>Ejecutar Animación</button>
+                {/* Selección de Animación */}
+                {selectedCategory && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Animación:</label>
+                        <select
+                            value={selectedAnimation}
+                            onChange={(e) => setSelectedAnimation(e.target.value)}
+                            disabled={controlsDisabled}
+                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                        >
+                            <option value="">Seleccione una animación</option>
+                            {(animations[selectedCategory]?.[selectedSubcategory] || animations[selectedCategory]?._no_subcategory || []).map(anim => (
+                                <option key={anim} value={anim}>{anim}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+            </div>
+
+            <button 
+                onClick={handleAnimation} 
+                disabled={!selectedAnimation || controlsDisabled}
+                className="mt-auto w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-400"
+            >
+                Ejecutar Animación
+            </button>
         </div>
     );
 };

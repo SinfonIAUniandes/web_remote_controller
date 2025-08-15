@@ -43,41 +43,47 @@ const LEDController = () => {
     };
 
     return (
-        <div>
-            <h2>Control de LEDs</h2>
+        <div className="flex flex-col h-full">
+            <h2 className="text-lg font-semibold text-center mb-4">Control de LEDs</h2>
 
-            {/* Input para el nombre del LED */}
-            <div>
-                <label>Nombre del LED: </label>
-                <input
-                    type="text"
-                    value={ledName}
-                    onChange={(e) => setLedName(e.target.value)}
-                />
+            <div className="space-y-3 flex-grow">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Nombre del LED:</label>
+                    <input
+                        type="text"
+                        value={ledName}
+                        onChange={(e) => setLedName(e.target.value)}
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Color del LED:</label>
+                    <input
+                        type="color"
+                        value={color}
+                        onChange={(e) => setColor(e.target.value)}
+                        className="mt-1 block w-full h-10 p-1 border border-gray-300 rounded-md"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Duración (segundos):</label>
+                    <input
+                        type="number"
+                        value={duration}
+                        onChange={(e) => setDuration(parseFloat(e.target.value) || 0)}
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
+                    />
+                </div>
             </div>
 
-            {/* Input para el color del LED */}
-            <div>
-                <label>Color del LED: </label>
-                <input
-                    type="color"
-                    value={color}
-                    onChange={(e) => setColor(e.target.value)}
-                />
-            </div>
-
-            {/* Input para la duración de la transición */}
-            <div>
-                <label>Duración (en segundos): </label>
-                <input
-                    type="number"
-                    value={duration}
-                    onChange={(e) => setDuration(parseFloat(e.target.value) || 0)}
-                />
-            </div>
-
-            {/* Botón para actualizar el color de los LEDs */}
-            <button onClick={setLEDColor}>Actualizar LEDs</button>
+            <button 
+                onClick={setLEDColor}
+                className="mt-4 w-full px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors"
+            >
+                Actualizar LEDs
+            </button>
         </div>
     );
 };

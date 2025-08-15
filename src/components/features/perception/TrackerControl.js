@@ -41,13 +41,29 @@ const TrackerControl = () => {
     };
 
     return (
-        <div>
-            <h2>Control del Tracker</h2>
-            <p>Estado actual: {trackerState}</p>
-            {/* 4. Actualizar los botones para llamar a la nueva función con los modos correctos */}
-            <button onClick={() => handleSetTrackerMode('start_head')}>Rastrear con Cabeza</button>
-            <button onClick={() => handleSetTrackerMode('start_move')} style={{ marginLeft: '10px' }}>Rastrear con Cuerpo</button>
-            <button onClick={() => handleSetTrackerMode('stop')} style={{ marginLeft: '10px' }}>Apagar Tracker</button>
+        <div className="text-center flex flex-col h-full items-center justify-center">
+            <h2 className="text-lg font-semibold mb-2">Control del Tracker</h2>
+            <p className="text-sm text-gray-600 mb-4">Estado actual: <strong className="font-semibold">{trackerState}</strong></p>
+            <div className="flex flex-col sm:flex-row justify-center gap-2">
+                <button 
+                    onClick={() => handleSetTrackerMode('start_head')}
+                    className="px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors"
+                >
+                    Rastrear con Cabeza
+                </button>
+                <button 
+                    onClick={() => handleSetTrackerMode('start_move')}
+                    className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition-colors"
+                >
+                    Rastrear con Cuerpo
+                </button>
+                <button 
+                    onClick={() => handleSetTrackerMode('stop')}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                >
+                    Apagar Tracker
+                </button>
+            </div>
         </div>
     );
 };

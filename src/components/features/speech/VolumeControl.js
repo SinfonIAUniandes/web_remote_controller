@@ -56,19 +56,32 @@ const VolumeControl = () => {
     };
 
     return (
-        <div style={{ textAlign: 'center' }}>
-            <h2>Control de Volumen del Robot</h2>
-            <div>
-                <label>Volumen: {volume}</label>
+        <div className="text-center flex flex-col h-full">
+            <h2 className="text-lg font-semibold mb-4">Control de Volumen</h2>
+            <div className="flex-grow flex flex-col items-center justify-center">
+                <label className="text-lg font-medium text-gray-700 mb-2">Volumen: {volume}%</label>
                 <input
                     type="range"
                     min="0"
                     max="100"
                     value={volume}
                     onChange={handleVolumeChange}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                 />
-                <button onClick={increaseVolume}>Subir Volumen</button>
-                <button onClick={decreaseVolume}>Bajar Volumen</button>
+                <div className="flex justify-center gap-4 mt-4">
+                    <button 
+                        onClick={decreaseVolume}
+                        className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors"
+                    >
+                        -
+                    </button>
+                    <button 
+                        onClick={increaseVolume}
+                        className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors"
+                    >
+                        +
+                    </button>
+                </div>
             </div>
         </div>
     );

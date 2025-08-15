@@ -60,63 +60,33 @@ const RobotAudioControl = () => {
     };
 
     return (
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <h2>Reproducir audio en el Robot</h2>
-
-            {/* Campo para ingresar la URL */}
-            <div style={{ marginBottom: '10px' }}>
-                <label>URL del audio:</label>
-                <br />
+        <div className="text-center flex flex-col h-full">
+            <h2 className="text-lg font-semibold mb-4">Reproducir Audio en Robot</h2>
+            <div className="flex-grow">
+                <label htmlFor="audio-url" className="block text-sm font-medium text-gray-700 mb-1">URL del audio:</label>
                 <input
+                    id="audio-url"
                     type="text"
                     value={audioUrl}
                     onChange={(e) => setAudioUrl(e.target.value)}
-                    placeholder="Ingrese la URL del audio"
-                    style={{
-                        width: '60%',
-                        padding: '8px',
-                        marginTop: '5px',
-                        borderRadius: '5px',
-                        border: '1px solid #ccc',
-                    }}
+                    placeholder="http://.../audio.mp3"
+                    className="w-full p-2 border border-gray-300 rounded-md"
                 />
             </div>
-
-            {/* Botones para reproducir y detener audio */}
-            <div style={{ marginTop: '10px' }}>
+            <div className="mt-4 flex justify-center gap-2">
                 <button 
                     onClick={handlePlayUrl} 
                     disabled={!audioUrl.trim() || !audioService}
-                    style={{
-                        padding: '10px 15px',
-                        fontSize: '16px',
-                        backgroundColor: '#007BFF',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        marginRight: '10px',
-                        opacity: !audioUrl.trim() || !audioService ? 0.5 : 1
-                    }}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:bg-gray-400"
                 >
-                    Reproducir Audio
+                    Reproducir
                 </button>
-
                 <button 
                     onClick={handleStopAudio} 
                     disabled={!stopAudioService}
-                    style={{
-                        padding: '10px 15px',
-                        fontSize: '16px',
-                        backgroundColor: '#DC3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        opacity: !stopAudioService ? 0.5 : 1
-                    }}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:bg-gray-400"
                 >
-                    Detener Audio
+                    Detener
                 </button>
             </div>
         </div>

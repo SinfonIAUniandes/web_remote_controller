@@ -34,10 +34,22 @@ const AutonomousLifeControl = () => {
     };
 
     return (
-        <div>
-            <h2>Control de Vida Autónoma</h2>
-            <button onClick={() => toggleAutonomousLife(true)}>Activar Vida Autónoma</button>
-            <button onClick={() => toggleAutonomousLife(false)}>Desactivar Vida Autónoma</button>
+        <div className="text-center flex flex-col h-full items-center justify-center">
+            <h2 className="text-lg font-semibold mb-4">Control de Vida Autónoma</h2>
+            <div className="grid grid-cols-2 gap-2">
+                <button 
+                    onClick={() => toggleAutonomousLife(true)}
+                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                >
+                    Activar
+                </button>
+                <button 
+                    onClick={() => toggleAutonomousLife(false)}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                >
+                    Desactivar
+                </button>
+            </div>
         </div>
     );
 };
