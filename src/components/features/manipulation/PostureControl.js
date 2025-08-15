@@ -41,22 +41,23 @@ const RobotPostureControl = () => {
 
         if (robotModel === 'NAO') {
             return (
-                <>
+                <div className="grid grid-cols-2 gap-2">
                     <button onClick={() => handlePosture('stand')} className={buttonClass}>Pararse</button>
-                    <button onClick={() => handlePosture('sit')} className={buttonClass}>Sentarse</button>
                     <button onClick={() => handlePosture('rest')} className={buttonClass}>Agacharse</button>
+                    <button onClick={() => handlePosture('sit')} className={buttonClass}>Sentarse</button>
                     <button onClick={() => handlePosture('sit-relax')} className={buttonClass}>Relajarse</button>
-                    <button onClick={() => handlePosture('lying-back')} className={buttonClass}>Acostarse</button>
-                </>
+                    <button onClick={() => handlePosture('lying-back')} className={buttonClass}>Acostarse (Espalda)</button>
+                    <button onClick={() => handlePosture('lying-front')} className={buttonClass}>Acostarse (Frente)</button>
+                </div>
             );
         }
 
         if (robotModel === 'Pepper') {
             return (
-                <>
+                <div className="grid grid-cols-1 gap-2">
                     <button onClick={() => handlePosture('stand')} className={buttonClass}>Pararse (Stand)</button>
                     <button onClick={() => handlePosture('rest')} className={buttonClass}>Agacharse (Rest)</button>
-                </>
+                </div>
             );
         }
 
