@@ -1,0 +1,13 @@
+[
+    {
+      "name": "Saludar",
+      "icon": "👋",
+      "animation": "Stand/Emotions/Neutral/Hello_1",
+      "speech": {
+        "text": "Hola, soy Nao, mucho gusto en conocerte.",
+        "volume": 80,
+        "animated": true,
+        "language": "Spanish"
+      }
+    }
+]

@@ -1,0 +1,13 @@
+[
+    {
+        "name": "Presentarse",
+        "icon": "🙋‍♂️",
+        "animation": "Gestures/Enthusiastic_4",
+        "speech": {
+          "text": "Hola a todos, mi nombre es Pepper. ¡Es un placer estar aquí!",
+          "volume": 75,
+          "animated": true,
+          "language": "Spanish"
+        }
+    }
+]

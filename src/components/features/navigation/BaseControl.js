@@ -4,7 +4,7 @@ import { createTopic, publishMessage } from '../../../services/RosManager';
 
 const BaseControl = () => {
     const { ros } = useRos();
-    const [speed, setSpeed] = useState(0.3); // Estado para la velocidad ajustable
+    const [speed, setSpeed] = useState(0.3);
     const pressedKeys = useRef(new Set());
     const cmdVelTopic = useRef(null);
 
@@ -13,10 +13,7 @@ const BaseControl = () => {
             console.error("La conexión con ROS no está disponible.");
             return;
         }
-        // Crear el tópico una sola vez
         cmdVelTopic.current = createTopic(ros, '/cmd_vel', 'geometry_msgs/msg/Twist');
-
-        // Función de limpieza para detener el robot si el componente se desmonta
         return () => {
             if (cmdVelTopic.current) {
                 const stopMessage = {
@@ -84,8 +81,9 @@ const BaseControl = () => {
     }, [handleKeyDown, handleKeyUp]);
 
     return (
-        <div style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '20px' }}>
-            <label htmlFor="speed-slider">Velocidad: {speed.toFixed(2)}</label>
+        <div className="w-full md:w-[calc(50%-1.5rem)] xl:w-[calc(33.33%-1.5rem)] bg-white rounded-lg shadow-lg p-4 flex flex-col">
+            <h3 className="text-lg font-semibold mb-2">Control de Movimiento</h3>
+            <label htmlFor="speed-slider" className="mb-1">Velocidad: {speed.toFixed(2)}</label>
             <input
                 id="speed-slider"
                 type="range"
@@ -94,8 +92,14 @@ const BaseControl = () => {
                 step="0.1"
                 value={speed}
                 onChange={(e) => setSpeed(parseFloat(e.target.value))}
-                style={{ width: '100%' }}
+                className="w-full"
             />
+            <div className="mt-4 text-sm text-gray-600">
+                <p className="font-bold">Usa el teclado para moverte:</p>
+                <p>W: Adelante, S: Atrás</p>
+                <p>A: Izquierda, D: Derecha</p>
+                <p>Q: Rotar Izquierda, E: Rotar Derecha</p>
+            </div>
         </div>
     );
 };
