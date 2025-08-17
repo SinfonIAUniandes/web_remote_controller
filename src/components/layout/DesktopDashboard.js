@@ -17,6 +17,7 @@ import TrackerControl from '../features/perception/TrackerControl';
 import VolumeControl from '../features/speech/VolumeControl';
 import HeadControl from '../features/manipulation/HeadControl';
 import TabletDisplay from '../features/interface/TabletDisplay';
+import GamepadControl from '../features/navigation/GamepadControl';
 
 const Dashboard = () => {
     const { robotModel } = useRos();
@@ -25,6 +26,7 @@ const Dashboard = () => {
         <div className="p-4 sm:p-6">
             <MicrophoneFeed /> {/* Componente sin UI visible, solo para recibir audio */}
             <HeadControl /> {/* Componente sin UI visible, solo para controlar la cabeza del robot */}
+            <GamepadControl speed={0.5} />
             <div className="flex flex-wrap justify-center gap-6">
                 {/* Cada componente se renderiza dentro de una tarjeta con estilos de Tailwind */}
                 <BaseControl />

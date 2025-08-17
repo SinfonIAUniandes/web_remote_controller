@@ -18,60 +18,31 @@ export const RosProvider = ({ children }) => {
     // Detección robusta de dispositivo móvil
     useEffect(() => {
         const detectMobile = () => {
-            const nav = navigator || {};
-            const ua = nav.userAgent || nav.vendor || window.opera || '';
+            // La forma más fiable es buscar patrones de SO móvil en el User Agent.
+            const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-            // 1) userAgentData moderno (cuando está disponible)
-            let uaIsMobile = false;
-            try {
-                if (nav.userAgentData && typeof nav.userAgentData.mobile === 'boolean') {
-                    uaIsMobile = nav.userAgentData.mobile;
-                } else {
-                    uaIsMobile = /\b(Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Tablet)\b/i.test(ua);
-                }
-            } catch (e) {
-                uaIsMobile = /\b(Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Tablet)\b/i.test(ua);
-            }
+            // Como segunda comprobación, consideramos los dispositivos táctiles con pantallas más pequeñas.
+            // Esto evita que los portátiles con pantalla táctil se clasifiquen como móviles.
+            const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            const isSmallScreen = window.innerWidth < 1024; // Usamos un umbral más grande para incluir tabletas.
 
-            // 2) soporte táctil (maxTouchPoints / ontouchstart)
-            const hasTouch =
-                ('ontouchstart' in window) ||
-                (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) ||
-                (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints > 0);
-
-            // 3) pointer coarse (tabletas y móviles suelen ser coarse)
-            const pointerCoarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-
-            // 4) tamaño de pantalla como factor secundario (no único criterio)
-            const minScreen = Math.min(window.screen.width || Infinity, window.screen.height || Infinity);
-            const smallScreen = minScreen <= 900; // umbral razonable para tablets/telefonos
-
-            // Regla combinada: UA móvil OR (touch + (pointer coarse OR pantalla pequeña))
-            const mobile = uaIsMobile || (hasTouch && (pointerCoarse || smallScreen));
-
-            return mobile;
+            // Se considera móvil si el User Agent lo indica, o si es un dispositivo táctil con pantalla pequeña.
+            return isMobileUA || (hasTouch && isSmallScreen);
         };
 
         const applyDetection = () => {
-            try {
-                setIsMobile(detectMobile());
-            } catch (e) {
-                // Fallback conservador
-                setIsMobile(window.innerWidth <= 768);
-            }
+            setIsMobile(detectMobile());
         };
 
         applyDetection();
 
+        // Re-evaluar solo en cambios de orientación o al redimensionar la ventana.
         window.addEventListener('resize', applyDetection);
         window.addEventListener('orientationchange', applyDetection);
-        // Escuchar un touchstart inicial ayuda a detectar dispositivos táctiles en algunos entornos
-        window.addEventListener('touchstart', applyDetection, { passive: true });
 
         return () => {
             window.removeEventListener('resize', applyDetection);
             window.removeEventListener('orientationchange', applyDetection);
-            window.removeEventListener('touchstart', applyDetection);
         };
     }, []);
 
