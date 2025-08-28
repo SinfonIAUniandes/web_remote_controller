@@ -19,8 +19,8 @@ const StateControl = () => {
     const { ros } = useRos();
 
     // Estados para cada interruptor. Asumimos un estado inicial por defecto.
-    const [autonomousLifeEnabled, setAutonomousLifeEnabled] = useState(true);
     const [securityEnabled, setSecurityEnabled] = useState(true);
+    const [autonomousLifeEnabled, setAutonomousLifeEnabled] = useState(false);
     const [breathingEnabled, setBreathingEnabled] = useState(false);
     const [trackerEnabled, setTrackerEnabled] = useState(false);
 

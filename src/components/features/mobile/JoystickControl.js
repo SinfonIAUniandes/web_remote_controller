@@ -18,7 +18,7 @@ const JoystickControl = ({ speed }) => {
     const animationFrameId = useRef(null);
 
     const maxDistance = 24; // Reducido para coincidir con el nuevo tamaño visual
-    const deadzone = 6;
+    const deadzone = 12;
 
     useEffect(() => {
         if (ros) {

@@ -14,8 +14,10 @@ const CameraFeed = () => {
         }
 
         // Crear tópicos para consumir y mostrar imágenes
-        const frontCameraCompressedTopic = createTopic(ros, '/camera/front/image_raw/compressed', 'sensor_msgs/msg/CompressedImage');
-        const bottomCameraCompressedTopic = createTopic(ros, '/camera/bottom/image_raw/compressed', 'sensor_msgs/msg/CompressedImage');
+                const frontCameraRawTopic = createTopic(ros, '/camera/front/image_raw', 'sensor_msgs/msg/Image');
+                const frontCameraCompressedTopic = createTopic(ros, '/camera/front/image_raw/compressed', 'sensor_msgs/msg/CompressedImage');
+                const bottomCameraRawTopic = createTopic(ros, '/camera/bottom/image_raw', 'sensor_msgs/msg/Image');
+                const bottomCameraCompressedTopic = createTopic(ros, '/camera/bottom/image_raw/compressed', 'sensor_msgs/msg/CompressedImage');
 
         // Suscribirse a los tópicos comprimidos para mostrar las imágenes
         const frontCompressedSub = subscribeToTopic(frontCameraCompressedTopic, (message) => {
@@ -29,6 +31,11 @@ const CameraFeed = () => {
                 bottomCameraRef.current.src = "data:image/jpeg;base64," + message.data;
             }
         });
+        
+                // Suscribirse a los tópicos sin comprimir para consumirlos (sin mostrar)
+                const frontRawSub = subscribeToTopic(frontCameraRawTopic, () => {});
+        
+                const bottomRawSub = subscribeToTopic(bottomCameraRawTopic, () => {});
 
         // Limpiar las suscripciones al desmontar el componente
         return () => {
